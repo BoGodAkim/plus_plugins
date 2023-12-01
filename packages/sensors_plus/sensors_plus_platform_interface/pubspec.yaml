@@ -10,6 +10,7 @@ dependencies:
   logging: ^1.2.0
   meta: ^1.8.0
   plugin_platform_interface: ^2.1.4
+  vector_math: ^2.1.4
 
 dev_dependencies:
   flutter_test:

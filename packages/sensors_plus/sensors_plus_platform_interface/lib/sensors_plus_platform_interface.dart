@@ -19,6 +19,7 @@ export 'src/gyroscope_event.dart';
 export 'src/magnetometer_event.dart';
 export 'src/user_accelerometer_event.dart';
 export 'src/sensor_interval.dart';
+export 'src/accuracy.dart';
 
 /// The common platform interface for sensors.
 abstract class SensorsPlatform extends PlatformInterface {

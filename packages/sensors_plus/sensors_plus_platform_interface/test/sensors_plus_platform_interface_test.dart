@@ -53,8 +53,9 @@ void main() {
 
   test('accelerometerEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/accelerometer';
-    const sensorData = <double>[1.0, 2.0, 3.0];
-    _initializeFakeMethodChannel('setAccelerationSamplingPeriod');
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[1.0, 2.0, 3.0, -1.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setAccelerometerSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
     final event = await accelerometerEventStream().first;
@@ -62,6 +63,8 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+    expect(event.accuracy, Accuracy.unknown);
+    expect(event.timestamp, timestamp);
   });
 
   test('isAccelerometerAvailable are working', () async {
@@ -74,7 +77,8 @@ void main() {
 
   test('gyroscopeEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/gyroscope';
-    const sensorData = <double>[3.0, 4.0, 5.0];
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[3.0, 4.0, 5.0, 0.0, timestamp.microsecondsSinceEpoch.toDouble()];
     _initializeFakeMethodChannel('setGyroscopeSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
@@ -83,6 +87,8 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+    expect(event.accuracy, Accuracy.uncalibrated);
+    expect(event.timestamp, timestamp);
   });
 
   test('isGyroscopeAvailable are working', () async {
@@ -95,7 +101,8 @@ void main() {
 
   test('userAccelerometerEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/user_accel';
-    const sensorData = <double>[6.0, 7.0, 8.0];
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[6.0, 7.0, 8.0, 1.0, timestamp.microsecondsSinceEpoch.toDouble()];
     _initializeFakeMethodChannel('setUserAccelerometerSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
@@ -104,6 +111,8 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+    expect(event.accuracy, Accuracy.low);
+    expect(event.timestamp, timestamp);
   });
 
   test('isUserAccelerometerAvailable are working', () async {
@@ -116,7 +125,8 @@ void main() {
 
   test('magnetometerEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/magnetometer';
-    const sensorData = <double>[8.0, 9.0, 10.0];
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
     _initializeFakeMethodChannel('setMagnetometerSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
@@ -125,6 +135,8 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
   });
 
   test('isMagnetometerAvailable are working', () async {

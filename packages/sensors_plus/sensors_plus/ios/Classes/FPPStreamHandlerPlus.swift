@@ -24,15 +24,19 @@ func _initMotionManager() {
     }
 }
 
-func sendTriplet(x: Float64, y: Float64, z: Float64, sink: @escaping FlutterEventSink) {
+func sendData(data: Array<Float64>, sink: @escaping FlutterEventSink) {
     if _isCleanUp {
         return
     }
     // Even after [detachFromEngineForRegistrar] some events may still be received
     // and fired until fully detached.
+
+    // IOS doesn't have accuracy data, so we send -1 (unknown) instead.
+    data += Float64(-1)
+    data += Float64((Date().timeIntervalSince1970 * 1000000).rounded())
+
     DispatchQueue.main.async {
-        let triplet = [x, y, z]
-        triplet.withUnsafeBufferPointer { buffer in
+        data.withUnsafeBufferPointer { buffer in
             sink(FlutterStandardTypedData.init(float64: Data(buffer: buffer)))
         }
     }
@@ -71,10 +75,12 @@ class FPPAccelerometerStreamHandlerPlus: NSObject, MotionStreamHandler {
             // Multiply by gravity, and adjust sign values to
             // align with Android.
             let acceleration = data!.acceleration
-            sendTriplet(
-                    x: -acceleration.x * GRAVITY,
-                    y: -acceleration.y * GRAVITY,
-                    z: -acceleration.z * GRAVITY,
+            sendData(
+                    data:[
+                        -acceleration.x * GRAVITY,
+                        -acceleration.y * GRAVITY,
+                        -acceleration.z * GRAVITY
+                        ],
                     sink: sink
             )
         }
@@ -124,10 +130,12 @@ class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
             // Multiply by gravity, and adjust sign values to
             // align with Android.
             let acceleration = data!.userAcceleration
-            sendTriplet(
-                    x: -acceleration.x * GRAVITY,
-                    y: -acceleration.y * GRAVITY,
-                    z: -acceleration.z * GRAVITY,
+            sendData(
+                    data:[
+                        -acceleration.x * GRAVITY,
+                        -acceleration.y * GRAVITY,
+                        -acceleration.z * GRAVITY
+                        ],
                     sink: sink
             )
         }
@@ -175,7 +183,7 @@ class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
                 return
             }
             let rotationRate = data!.rotationRate
-            sendTriplet(x: rotationRate.x, y: rotationRate.y, z: rotationRate.z, sink: sink)
+            sendData(data: [ rotationRate.x, rotationRate.y, rotationRate.z ], sink: sink)
         }
         return nil
     }
@@ -221,7 +229,7 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
                 return
             }
             let magneticField = data!.magneticField
-            sendTriplet(x: magneticField.x, y: magneticField.y, z: magneticField.z, sink: sink)
+            sendData(data: [magneticField.x, magneticField.y, magneticField.z ], sink: sink)
         }
         return nil
     }

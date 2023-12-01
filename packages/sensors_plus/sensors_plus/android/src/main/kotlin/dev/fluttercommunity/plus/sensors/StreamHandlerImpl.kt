@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
+import java.time.Instant
 
 internal class StreamHandlerImpl(
     private val sensorManager: SensorManager,
@@ -14,6 +15,8 @@ internal class StreamHandlerImpl(
     private var sensorEventListener: SensorEventListener? = null
 
     private var sensor: Sensor? = null
+
+    private var accuracy: Int = -1
 
     var samplingPeriod = 200000
         set(value) {
@@ -65,13 +68,18 @@ internal class StreamHandlerImpl(
 
     private fun createSensorEventListener(events: EventSink): SensorEventListener {
         return object : SensorEventListener {
-            override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+            override fun onAccuracyChanged(sensor: Sensor, newAccuracy: Int) {
+                accuracy = newAccuracy
+            }
 
             override fun onSensorChanged(event: SensorEvent) {
-                val sensorValues = DoubleArray(event.values.size)
+                val sensorValues = DoubleArray(event.values.size + 2)
                 event.values.forEachIndexed { index, value ->
                     sensorValues[index] = value.toDouble()
                 }
+                sensorValues[event.values.size] = accuracy.toDouble()
+                val instant = Instant.now()
+                sensorValues[event.values.size + 1] = (instant.getEpochSecond() * 1000_000 + instant.getNano() / 1000).toDouble();
                 events.success(sensorValues)
             }
         }

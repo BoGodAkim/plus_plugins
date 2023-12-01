@@ -25,7 +25,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, this.title}) : super(key: key);
+  const MyHomePage({super.key, this.title});
 
   final String? title;
 
@@ -66,11 +66,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _userAccelerometerAvailable = false;
   bool _magnetometerAvailable = false;
 
-  DateTime? _userAccelerometerUpdateTime;
-  DateTime? _accelerometerUpdateTime;
-  DateTime? _gyroscopeUpdateTime;
-  DateTime? _magnetometerUpdateTime;
-
   int? _userAccelerometerLastInterval;
   int? _accelerometerLastInterval;
   int? _gyroscopeLastInterval;
@@ -78,6 +73,22 @@ class _MyHomePageState extends State<MyHomePage> {
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
 
   Duration sensorInterval = SensorInterval.normalInterval;
+
+  String accuracyToString(Accuracy? accuracy) {
+    switch (accuracy) {
+      case Accuracy.low:
+        return '🟠';
+      case Accuracy.medium:
+        return '🟡';
+      case Accuracy.high:
+        return '🟢';
+      case Accuracy.uncalibrated:
+        return '🔴';
+      case Accuracy.unknown:
+      default:
+        return '⚫';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     SizedBox.shrink(),
                     SizedBox.shrink(),
+                    SizedBox.shrink(),
                     Text('X'),
                     Text('Y'),
                     Text('Z'),
@@ -129,12 +141,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('UserAccelerometer'),
                     ),
-                    Text(_userAccelerometerAvailable? '✅' : '❌'),
+                    Text(_userAccelerometerAvailable ? '✅' : '❌'),
+                    Text(accuracyToString(_userAccelerometerEvent?.accuracy)),
                     Text(_userAccelerometerEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_userAccelerometerEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_userAccelerometerEvent?.z.toStringAsFixed(1) ?? '?'),
-                    Text(
-                        '${_userAccelerometerLastInterval?.toString() ?? '?'} ms'),
+                    Text('${_userAccelerometerLastInterval?.toString() ?? '?'} ms'),
                   ],
                 ),
                 TableRow(
@@ -143,7 +155,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Accelerometer'),
                     ),
-                    Text(_accelerometerAvailable? '✅' : '❌'),
+                    Text(_accelerometerAvailable ? '✅' : '❌'),
+                    Text(accuracyToString(_accelerometerEvent?.accuracy)),
                     Text(_accelerometerEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_accelerometerEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_accelerometerEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -156,7 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Gyroscope'),
                     ),
-                    Text(_gyroscopeAvailable? '✅' : '❌'),
+                    Text(_gyroscopeAvailable ? '✅' : '❌'),
+                    Text(accuracyToString(_gyroscopeEvent?.accuracy)),
                     Text(_gyroscopeEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_gyroscopeEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_gyroscopeEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -169,7 +183,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Magnetometer'),
                     ),
-                    Text(_magnetometerAvailable? '✅' : '❌'),
+                    Text(_magnetometerAvailable ? '✅' : '❌'),
+                    Text(accuracyToString(_magnetometerEvent?.accuracy)),
                     Text(_magnetometerEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_magnetometerEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_magnetometerEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -214,8 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onSelectionChanged: (value) {
                   setState(() {
                     sensorInterval = value.first;
-                    userAccelerometerEventStream(
-                        samplingPeriod: sensorInterval);
+                    userAccelerometerEventStream(samplingPeriod: sensorInterval);
                     accelerometerEventStream(samplingPeriod: sensorInterval);
                     gyroscopeEventStream(samplingPeriod: sensorInterval);
                     magnetometerEventStream(samplingPeriod: sensorInterval);
@@ -240,34 +254,32 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    
+
     isAccelerometerAvailable.then((value) => setState(() {
-      _accelerometerAvailable = value;
-    }));
+          _accelerometerAvailable = value;
+        }));
     isGyroscopeAvailable.then((value) => setState(() {
-      _gyroscopeAvailable = value;
-    }));
+          _gyroscopeAvailable = value;
+        }));
     isUserAccelerometerAvailable.then((value) => setState(() {
-      _userAccelerometerAvailable = value;
-    }));
+          _userAccelerometerAvailable = value;
+        }));
     isMagnetometerAvailable.then((value) => setState(() {
-      _magnetometerAvailable = value;
-    }));
+          _magnetometerAvailable = value;
+        }));
 
     _streamSubscriptions.add(
       userAccelerometerEventStream(samplingPeriod: sensorInterval).listen(
         (UserAccelerometerEvent event) {
-          final now = DateTime.now();
           setState(() {
-            _userAccelerometerEvent = event;
-            if (_userAccelerometerUpdateTime != null) {
-              final interval = now.difference(_userAccelerometerUpdateTime!);
+            if (_userAccelerometerEvent != null) {
+              final interval = event.timestamp.difference(_userAccelerometerEvent!.timestamp);
               if (interval > _ignoreDuration) {
                 _userAccelerometerLastInterval = interval.inMilliseconds;
               }
             }
+            _userAccelerometerEvent = event;
           });
-          _userAccelerometerUpdateTime = now;
         },
         onError: (e) {
           showDialog(
@@ -275,8 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (context) {
                 return const AlertDialog(
                   title: Text("Sensor Not Found"),
-                  content: Text(
-                      "It seems that your device doesn't support User Accelerometer Sensor"),
+                  content: Text("It seems that your device doesn't support User Accelerometer Sensor"),
                 );
               });
         },
@@ -286,17 +297,15 @@ class _MyHomePageState extends State<MyHomePage> {
     _streamSubscriptions.add(
       accelerometerEventStream(samplingPeriod: sensorInterval).listen(
         (AccelerometerEvent event) {
-          final now = DateTime.now();
           setState(() {
-            _accelerometerEvent = event;
-            if (_accelerometerUpdateTime != null) {
-              final interval = now.difference(_accelerometerUpdateTime!);
+            if (_accelerometerEvent != null) {
+              final interval = event.timestamp.difference(_accelerometerEvent!.timestamp);
               if (interval > _ignoreDuration) {
                 _accelerometerLastInterval = interval.inMilliseconds;
               }
             }
+            _accelerometerEvent = event;
           });
-          _accelerometerUpdateTime = now;
         },
         onError: (e) {
           showDialog(
@@ -304,8 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (context) {
                 return const AlertDialog(
                   title: Text("Sensor Not Found"),
-                  content: Text(
-                      "It seems that your device doesn't support Accelerometer Sensor"),
+                  content: Text("It seems that your device doesn't support Accelerometer Sensor"),
                 );
               });
         },
@@ -315,17 +323,15 @@ class _MyHomePageState extends State<MyHomePage> {
     _streamSubscriptions.add(
       gyroscopeEventStream(samplingPeriod: sensorInterval).listen(
         (GyroscopeEvent event) {
-          final now = DateTime.now();
           setState(() {
-            _gyroscopeEvent = event;
-            if (_gyroscopeUpdateTime != null) {
-              final interval = now.difference(_gyroscopeUpdateTime!);
+            if (_gyroscopeEvent != null) {
+              final interval = event.timestamp.difference(_gyroscopeEvent!.timestamp);
               if (interval > _ignoreDuration) {
                 _gyroscopeLastInterval = interval.inMilliseconds;
               }
             }
+            _gyroscopeEvent = event;
           });
-          _gyroscopeUpdateTime = now;
         },
         onError: (e) {
           showDialog(
@@ -333,8 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (context) {
                 return const AlertDialog(
                   title: Text("Sensor Not Found"),
-                  content: Text(
-                      "It seems that your device doesn't support Gyroscope Sensor"),
+                  content: Text("It seems that your device doesn't support Gyroscope Sensor"),
                 );
               });
         },
@@ -344,17 +349,15 @@ class _MyHomePageState extends State<MyHomePage> {
     _streamSubscriptions.add(
       magnetometerEventStream(samplingPeriod: sensorInterval).listen(
         (MagnetometerEvent event) {
-          final now = DateTime.now();
           setState(() {
-            _magnetometerEvent = event;
-            if (_magnetometerUpdateTime != null) {
-              final interval = now.difference(_magnetometerUpdateTime!);
+            if (_magnetometerEvent != null) {
+              final interval = event.timestamp.difference(_magnetometerEvent!.timestamp);
               if (interval > _ignoreDuration) {
                 _magnetometerLastInterval = interval.inMilliseconds;
               }
             }
+            _magnetometerEvent = event;
           });
-          _magnetometerUpdateTime = now;
         },
         onError: (e) {
           showDialog(
@@ -362,8 +365,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (context) {
                 return const AlertDialog(
                   title: Text("Sensor Not Found"),
-                  content: Text(
-                      "It seems that your device doesn't support Magnetometer Sensor"),
+                  content: Text("It seems that your device doesn't support Magnetometer Sensor"),
                 );
               });
         },
