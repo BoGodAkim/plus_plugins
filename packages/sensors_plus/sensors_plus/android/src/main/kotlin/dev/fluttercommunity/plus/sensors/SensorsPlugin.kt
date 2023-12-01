@@ -36,18 +36,37 @@ class SensorsPlugin : FlutterPlugin {
     private fun setupMethodChannel(messenger: BinaryMessenger) {
         methodChannel = MethodChannel(messenger, METHOD_CHANNEL_NAME)
         methodChannel.setMethodCallHandler { call, result ->
-            val streamHandler = when (call.method) {
-                "setAccelerationSamplingPeriod" -> accelerometerStreamHandler
-                "setUserAccelerometerSamplingPeriod" -> userAccelStreamHandler
-                "setGyroscopeSamplingPeriod" -> gyroscopeStreamHandler
-                "setMagnetometerSamplingPeriod" -> magnetometerStreamHandler
-                else -> null
-            }
-            streamHandler?.samplingPeriod = call.arguments as Int
-            if (streamHandler != null) {
-                result.success(null)
-            } else {
-                result.notImplemented()
+            when(call.method.slice(0..1)) {
+                "is" -> {
+                    val streamHandler = when (call.method) {
+                        "isAccelerometerAvailable" -> accelerometerStreamHandler
+                        "isUserAccelerometerAvailable" -> userAccelStreamHandler
+                        "isGyroscopeAvailable" -> gyroscopeStreamHandler
+                        "isMagnetometerAvailable" -> magnetometerStreamHandler
+                        else -> null
+                    }
+                    if (streamHandler != null) {
+                        result.success(streamHandler.isSensorAvailable())
+                    } else {
+                        result.notImplemented()
+                    }
+                }
+                "se" -> {
+                    val streamHandler = when (call.method) {
+                        "setAccelerometerSamplingPeriod" -> accelerometerStreamHandler
+                        "setUserAccelerometerSamplingPeriod" -> userAccelStreamHandler
+                        "setGyroscopeSamplingPeriod" -> gyroscopeStreamHandler
+                        "setMagnetometerSamplingPeriod" -> magnetometerStreamHandler
+                        else -> null
+                    }
+                    streamHandler?.samplingPeriod = call.arguments as Int
+                    if (streamHandler != null) {
+                        result.success(null)
+                    } else {
+                        result.notImplemented()
+                    }
+                }
+                else -> result.notImplemented()
             }
         }
     }

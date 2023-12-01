@@ -64,6 +64,14 @@ void main() {
     expect(event.z, sensorData[2]);
   });
 
+  test('isAccelerometerAvailable are working', () async {
+    _initializeFakeMethodChannel('isAccelerometerAvailable', true);
+
+    final isAvailable = await methodChannel.isAccelerometerAvailable;
+
+    expect(isAvailable, true);
+  });
+
   test('gyroscopeEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/gyroscope';
     const sensorData = <double>[3.0, 4.0, 5.0];
@@ -75,6 +83,14 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+  });
+
+  test('isGyroscopeAvailable are working', () async {
+    _initializeFakeMethodChannel('isGyroscopeAvailable', true);
+
+    final isAvailable = await methodChannel.isGyroscopeAvailable;
+
+    expect(isAvailable, true);
   });
 
   test('userAccelerometerEvents are streamed', () async {
@@ -90,6 +106,14 @@ void main() {
     expect(event.z, sensorData[2]);
   });
 
+  test('isUserAccelerometerAvailable are working', () async {
+    _initializeFakeMethodChannel('isUserAccelerometerAvailable', true);
+
+    final isAvailable = await methodChannel.isUserAccelerometerAvailable;
+
+    expect(isAvailable, true);
+  });
+
   test('magnetometerEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/magnetometer';
     const sensorData = <double>[8.0, 9.0, 10.0];
@@ -102,9 +126,17 @@ void main() {
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
   });
+
+  test('isMagnetometerAvailable are working', () async {
+    _initializeFakeMethodChannel('isMagnetometerAvailable', true);
+
+    final isAvailable = await methodChannel.isMagnetometerAvailable;
+
+    expect(isAvailable, true);
+  });
 }
 
-void _initializeFakeMethodChannel(String methodName) {
+void _initializeFakeMethodChannel(String methodName, [dynamic returnValue]) {
   const standardMethod = StandardMethodCodec();
 
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -112,7 +144,7 @@ void _initializeFakeMethodChannel(String methodName) {
           (ByteData? message) async {
     final methodCall = standardMethod.decodeMethodCall(message);
     if (methodCall.method == methodName) {
-      return standardMethod.encodeSuccessEnvelope(null);
+      return standardMethod.encodeSuccessEnvelope(returnValue);
     } else {
       fail('Expected $methodName');
     }

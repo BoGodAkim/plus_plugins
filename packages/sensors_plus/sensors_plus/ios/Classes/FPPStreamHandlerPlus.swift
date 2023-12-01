@@ -47,6 +47,10 @@ class FPPAccelerometerStreamHandlerPlus: NSObject, MotionStreamHandler {
         }
     }
 
+    func isAvailable() -> Bool {
+        return _motionManager.isAccelerometerAvailable
+    }
+
     func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
@@ -94,6 +98,10 @@ class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
             _initMotionManager()
             _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
         }
+    }
+
+    func isAvailable() -> Bool {
+        return _motionManager.isDeviceMotionAvailable
     }
 
     func onListen(
@@ -145,6 +153,10 @@ class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
         }
     }
 
+    func isAvailable() -> Bool {
+        return _motionManager.isGyroAvailable
+    }
+
     func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
@@ -185,6 +197,10 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
             _initMotionManager()
             _motionManager.magnetometerUpdateInterval = Double(samplingPeriod) * 0.000001
         }
+    }
+
+    func isAvailable() -> Bool {
+        return _motionManager.isMagnetometerAvailable
     }
 
     func onListen(

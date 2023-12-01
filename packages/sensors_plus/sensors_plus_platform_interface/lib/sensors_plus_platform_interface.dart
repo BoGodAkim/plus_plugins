@@ -78,12 +78,22 @@ abstract class SensorsPlatform extends PlatformInterface {
         'listenToAccelerometerEvents has not been implemented.');
   }
 
+  /// Returns a boolean value indicating whether the accelerometer is available.
+  Future<bool> get isAccelerometerAvailable {
+    throw UnimplementedError('isAccelerometerAvailable has not been implemented.');
+  }
+
   /// Returns a broadcast stream of events from the device gyroscope at the
   /// given sampling frequency.
   Stream<GyroscopeEvent> gyroscopeEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
     throw UnimplementedError('gyroscopeEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the gyroscope is available.
+  Future<bool> get isGyroscopeAvailable {
+    throw UnimplementedError('isGyroscopeAvailable has not been implemented.');
   }
 
   /// Returns a broadcast stream of events from the device accelerometer with
@@ -95,11 +105,23 @@ abstract class SensorsPlatform extends PlatformInterface {
         'userAccelerometerEvents has not been implemented.');
   }
 
+  /// Returns a boolean value indicating whether the user accelerometer is
+  /// available.
+  Future<bool> get isUserAccelerometerAvailable {
+    throw UnimplementedError(
+        'isUserAccelerometerAvailable has not been implemented.');
+  }
+
   /// Returns a broadcast stream of events from the device magnetometer at the
   /// given sampling frequency.
   Stream<MagnetometerEvent> magnetometerEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
     throw UnimplementedError('magnetometerEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the magnetometer is available.
+  Future<bool> get isMagnetometerAvailable {
+    throw UnimplementedError('isMagnetometerAvailable has not been implemented.');
   }
 }

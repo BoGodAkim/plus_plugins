@@ -20,6 +20,10 @@ internal class StreamHandlerImpl(
             field = value
             updateRegistration()
         }
+    
+    fun isSensorAvailable(): Boolean {
+        return sensorManager.getDefaultSensor(sensorType) != null
+    }
 
     override fun onListen(arguments: Any?, events: EventSink) {
         sensor = sensorManager.getDefaultSensor(sensorType)

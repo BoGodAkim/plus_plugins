@@ -47,7 +47,7 @@ class MethodChannelSensors extends SensorsPlatform {
           'information');
       microseconds = 0;
     }
-    _methodChannel.invokeMethod('setAccelerationSamplingPeriod', microseconds);
+    _methodChannel.invokeMethod('setAccelerometerSamplingPeriod', microseconds);
     _accelerometerEvents ??= _accelerometerEventChannel
         .receiveBroadcastStream()
         .map((dynamic event) {
@@ -55,6 +55,12 @@ class MethodChannelSensors extends SensorsPlatform {
       return AccelerometerEvent(list[0]!, list[1]!, list[2]!);
     });
     return _accelerometerEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the accelerometer is available.
+  @override
+  Future<bool> get isAccelerometerAvailable async {
+    return await _methodChannel.invokeMethod('isAccelerometerAvailable');
   }
 
   /// Returns a broadcast stream of events from the device gyroscope at the
@@ -80,6 +86,12 @@ class MethodChannelSensors extends SensorsPlatform {
       return GyroscopeEvent(list[0]!, list[1]!, list[2]!);
     });
     return _gyroscopeEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the gyroscope is available.
+  @override
+  Future<bool> get isGyroscopeAvailable async {
+    return await _methodChannel.invokeMethod('isGyroscopeAvailable');
   }
 
   /// Returns a broadcast stream of events from the device accelerometer with
@@ -109,6 +121,13 @@ class MethodChannelSensors extends SensorsPlatform {
     return _userAccelerometerEvents!;
   }
 
+  /// Returns a boolean value indicating whether the user accelerometer is
+  /// available.
+  @override
+  Future<bool> get isUserAccelerometerAvailable async {
+    return await _methodChannel.invokeMethod('isUserAccelerometerAvailable');
+  }
+
   /// Returns a broadcast stream of events from the device magnetometer at the
   /// given sampling frequency.
   @override
@@ -132,5 +151,11 @@ class MethodChannelSensors extends SensorsPlatform {
       return MagnetometerEvent(list[0]!, list[1]!, list[2]!);
     });
     return _magnetometerEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the magnetometer is available.
+  @override
+  Future<bool> get isMagnetometerAvailable async {
+    return await _methodChannel.invokeMethod('isMagnetometerAvailable');
   }
 }

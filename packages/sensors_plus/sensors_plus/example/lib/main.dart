@@ -61,6 +61,11 @@ class _MyHomePageState extends State<MyHomePage> {
   GyroscopeEvent? _gyroscopeEvent;
   MagnetometerEvent? _magnetometerEvent;
 
+  bool _accelerometerAvailable = false;
+  bool _gyroscopeAvailable = false;
+  bool _userAccelerometerAvailable = false;
+  bool _magnetometerAvailable = false;
+
   DateTime? _userAccelerometerUpdateTime;
   DateTime? _accelerometerUpdateTime;
   DateTime? _gyroscopeUpdateTime;
@@ -105,11 +110,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Table(
               columnWidths: const {
                 0: FlexColumnWidth(4),
-                4: FlexColumnWidth(2),
+                5: FlexColumnWidth(2),
               },
               children: [
                 const TableRow(
                   children: [
+                    SizedBox.shrink(),
                     SizedBox.shrink(),
                     Text('X'),
                     Text('Y'),
@@ -123,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('UserAccelerometer'),
                     ),
+                    Text(_userAccelerometerAvailable? '✅' : '❌'),
                     Text(_userAccelerometerEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_userAccelerometerEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_userAccelerometerEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -136,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Accelerometer'),
                     ),
+                    Text(_accelerometerAvailable? '✅' : '❌'),
                     Text(_accelerometerEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_accelerometerEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_accelerometerEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -148,6 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Gyroscope'),
                     ),
+                    Text(_gyroscopeAvailable? '✅' : '❌'),
                     Text(_gyroscopeEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_gyroscopeEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_gyroscopeEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -160,6 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Magnetometer'),
                     ),
+                    Text(_magnetometerAvailable? '✅' : '❌'),
                     Text(_magnetometerEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_magnetometerEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_magnetometerEvent?.z.toStringAsFixed(1) ?? '?'),
@@ -230,6 +240,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    
+    isAccelerometerAvailable.then((value) => setState(() {
+      _accelerometerAvailable = value;
+    }));
+    isGyroscopeAvailable.then((value) => setState(() {
+      _gyroscopeAvailable = value;
+    }));
+    isUserAccelerometerAvailable.then((value) => setState(() {
+      _userAccelerometerAvailable = value;
+    }));
+    isMagnetometerAvailable.then((value) => setState(() {
+      _magnetometerAvailable = value;
+    }));
+
     _streamSubscriptions.add(
       userAccelerometerEventStream(samplingPeriod: sensorInterval).listen(
         (UserAccelerometerEvent event) {

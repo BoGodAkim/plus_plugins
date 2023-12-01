@@ -41,6 +41,12 @@ Stream<AccelerometerEvent> accelerometerEventStream({
   return _sensors.accelerometerEventStream(samplingPeriod: samplingPeriod);
 }
 
+/// Returns a boolean value indicating whether the accelerometer is available.
+@override
+Future<bool> get isAccelerometerAvailable async {
+  return await _sensors.isAccelerometerAvailable;
+}
+
 /// Returns a broadcast stream of events from the device gyroscope at the
 /// given sampling frequency.
 @override
@@ -48,6 +54,12 @@ Stream<GyroscopeEvent> gyroscopeEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
   return _sensors.gyroscopeEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the gyroscope is available.
+@override
+Future<bool> get isGyroscopeAvailable async {
+  return await _sensors.isGyroscopeAvailable;
 }
 
 /// Returns a broadcast stream of events from the device accelerometer with
@@ -59,6 +71,13 @@ Stream<UserAccelerometerEvent> userAccelerometerEventStream({
   return _sensors.userAccelerometerEventStream(samplingPeriod: samplingPeriod);
 }
 
+/// Returns a boolean value indicating whether the user accelerometer is
+/// available.
+@override
+Future<bool> get isUserAccelerometerAvailable async {
+  return await _sensors.isUserAccelerometerAvailable;
+}
+
 /// Returns a broadcast stream of events from the device magnetometer at the
 /// given sampling frequency.
 @override
@@ -66,4 +85,10 @@ Stream<MagnetometerEvent> magnetometerEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
   return _sensors.magnetometerEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the magnetometer is available.
+@override
+Future<bool> get isMagnetometerAvailable async {
+  return await _sensors.isMagnetometerAvailable;
 }

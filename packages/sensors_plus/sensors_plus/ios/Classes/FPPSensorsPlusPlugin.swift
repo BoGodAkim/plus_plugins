@@ -56,21 +56,43 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
                 binaryMessenger: registrar.messenger()
         )
         methodChannel.setMethodCallHandler { call, result in
-            let streamHandler: MotionStreamHandler!;
-            switch (call.method) {
-            case "setAccelerationSamplingPeriod":
-                streamHandler = _streamHandlers[accelerometerStreamHandlerName]
-            case "setUserAccelerometerSamplingPeriod":
-                streamHandler = _streamHandlers[userAccelerometerStreamHandlerName]
-            case "setGyroscopeSamplingPeriod":
-                streamHandler = _streamHandlers[gyroscopeStreamHandlerName]
-            case "setMagnetometerSamplingPeriod":
-                streamHandler = _streamHandlers[magnetometerStreamHandlerName]
+            switch (call.method[..<call.method.index(call.method.startIndex, offsetBy: 2)]) {
+            case "is":
+                let streamHandler: MotionStreamHandler!;
+                switch (call.method) {
+                case "isAccelerometerAvailable":
+                    streamHandler = _streamHandlers[accelerometerStreamHandlerName]
+                case "isUserAccelerometerAvailable":
+                    streamHandler = _streamHandlers[userAccelerometerStreamHandlerName]
+                case "isGyroscopeAvailable":
+                    streamHandler = _streamHandlers[gyroscopeStreamHandlerName]
+                case "isMagnetometerAvailable":
+                    streamHandler = _streamHandlers[magnetometerStreamHandlerName]
+                default:
+                    return result(FlutterMethodNotImplemented)
+                }
+                result(streamHandler.isAvailable())
+
+            case "se":
+                let streamHandler: MotionStreamHandler!;
+                switch (call.method) {
+                case "setAccelerometerSamplingPeriod":
+                    streamHandler = _streamHandlers[accelerometerStreamHandlerName]
+                case "setUserAccelerometerSamplingPeriod":
+                    streamHandler = _streamHandlers[userAccelerometerStreamHandlerName]
+                case "setGyroscopeSamplingPeriod":
+                    streamHandler = _streamHandlers[gyroscopeStreamHandlerName]
+                case "setMagnetometerSamplingPeriod":
+                    streamHandler = _streamHandlers[magnetometerStreamHandlerName]
+                default:
+                    return result(FlutterMethodNotImplemented)
+                }
+                streamHandler.samplingPeriod = call.arguments as! Int
+                result(nil)
+
             default:
                 return result(FlutterMethodNotImplemented)
             }
-            streamHandler.samplingPeriod = call.arguments as! Int
-            result(nil)
         }
 
         _isCleanUp = false
