@@ -18,10 +18,19 @@ import 'accuracy.dart';
 /// A compass is an example of a general utility for magnetometer data.
 class MagnetometerEvent {
   /// Constructs a new instance with the given [x], [y], and [z] values.
-  ///
-  /// See [MagnetometerEvent] for more information.
   MagnetometerEvent(double x, double y, double z, [DateTime? timestamp, this.accuracy = Accuracy.unknown])
       : vector = Vector3(x, y, z),
+        timestamp = timestamp ?? DateTime.now();
+
+  /// Constructs a new instance from a list of 3 doubles [magnetometerList].
+  MagnetometerEvent.fromList(List<double> magnetometerList, [DateTime? timestamp, this.accuracy = Accuracy.unknown])
+      : vector = Vector3.array(magnetometerList),
+        timestamp = timestamp ?? DateTime.now();
+
+  /// Constructs a new instance from a [vector].
+  /// The vector is copied.
+  MagnetometerEvent.fromVector3(Vector3 vector, [DateTime? timestamp, this.accuracy = Accuracy.unknown])
+      : vector = Vector3.copy(vector),
         timestamp = timestamp ?? DateTime.now();
 
   /// Vector describing the ambient magnetic field in ***μT***.

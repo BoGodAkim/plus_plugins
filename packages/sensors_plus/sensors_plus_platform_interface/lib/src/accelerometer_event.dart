@@ -16,6 +16,17 @@ class AccelerometerEvent {
       : vector = Vector3(x, y, z),
         timestamp = timestamp ?? DateTime.now();
 
+  /// Constructs an instance from a list of 3 doubles [accelerometerList].
+  AccelerometerEvent.fromList(List<double> accelerometerList, [DateTime? timestamp, this.accuracy = Accuracy.unknown])
+      : vector = Vector3.array(accelerometerList),
+        timestamp = timestamp ?? DateTime.now();
+
+  /// Constructs an instance from a [vector].
+  /// The vector is copied.
+  AccelerometerEvent.fromVector3(Vector3 vector, [DateTime? timestamp, this.accuracy = Accuracy.unknown])
+      : vector = Vector3.copy(vector),
+        timestamp = timestamp ?? DateTime.now();
+
   /// Vector describing the acceleration of the device in m/s^2 (including
   /// gravity).
   ///
