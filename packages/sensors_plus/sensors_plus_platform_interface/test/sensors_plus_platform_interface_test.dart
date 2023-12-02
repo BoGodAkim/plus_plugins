@@ -3,87 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart'
-    show TestDefaultBinaryMessengerBinding, TestWidgetsFlutterBinding;
+import 'package:flutter_test/flutter_test.dart' show TestDefaultBinaryMessengerBinding, TestWidgetsFlutterBinding;
 import 'package:sensors_plus_platform_interface/sensors_plus_platform_interface.dart';
 import 'package:sensors_plus_platform_interface/src/method_channel_sensors.dart';
 import 'package:test/test.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 final MethodChannelSensors methodChannel = MethodChannelSensors();
-
-/// Returns a broadcast stream of events from the device accelerometer at the
-/// given sampling frequency.
-@override
-Stream<AccelerometerEvent> accelerometerEventStream({
-  Duration samplingPeriod = SensorInterval.normalInterval,
-}) {
-  return methodChannel.accelerometerEventStream(samplingPeriod: samplingPeriod);
-}
-
- /// Returns a boolean value indicating whether the accelerometer is available.
-Future<bool> get isAccelerometerAvailable {
-  return methodChannel.isAccelerometerAvailable;
-}
-
-/// Returns a broadcast stream of events from the device gyroscope at the
-/// given sampling frequency.
-@override
-Stream<GyroscopeEvent> gyroscopeEventStream({
-  Duration samplingPeriod = SensorInterval.normalInterval,
-}) {
-  return methodChannel.gyroscopeEventStream(samplingPeriod: samplingPeriod);
-}
-
-/// Returns a boolean value indicating whether the gyroscope is available.
-Future<bool> get isGyroscopeAvailable {
-  return methodChannel.isGyroscopeAvailable;
-}
-
-/// Returns a broadcast stream of events from the device accelerometer with
-/// gravity removed at the given sampling frequency.
-@override
-Stream<UserAccelerometerEvent> userAccelerometerEventStream({
-  Duration samplingPeriod = SensorInterval.normalInterval,
-}) {
-  return methodChannel.userAccelerometerEventStream(
-      samplingPeriod: samplingPeriod);
-}
-
-/// Returns a boolean value indicating whether the user accelerometer is
-/// available.
-Future<bool> get isUserAccelerometerAvailable {
-  return methodChannel.isUserAccelerometerAvailable;
-}
-
-/// Returns a broadcast stream of events from the device gravity sensor at the
-/// given sampling frequency.
-@override
-Stream<GravityEvent> gravityEventStream({
-  Duration samplingPeriod = SensorInterval.normalInterval,
-}) {
-  return methodChannel.gravityEventStream(samplingPeriod: samplingPeriod);
-}
-
-/// Returns a boolean value indicating whether the gravity sensor is
-/// available.
-Future<bool> get isGravityAvailable {
-  return methodChannel.isGravityAvailable;
-}
-
-/// Returns a broadcast stream of events from the device magnetometer at the
-/// given sampling frequency.
-@override
-Stream<MagnetometerEvent> magnetometerEventStream({
-  Duration samplingPeriod = SensorInterval.normalInterval,
-}) {
-  return methodChannel.magnetometerEventStream(samplingPeriod: samplingPeriod);
-}
-
-/// Returns a boolean value indicating whether the magnetometer is
-/// available.
-Future<bool> get isMagnetometerAvailable {
-  return methodChannel.isMagnetometerAvailable;
-}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -95,7 +21,7 @@ void main() {
     _initializeFakeMethodChannel('setAccelerometerSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await accelerometerEventStream().first;
+    final event = await methodChannel.accelerometerEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -107,7 +33,7 @@ void main() {
   test('isAccelerometerAvailable are working', () async {
     _initializeFakeMethodChannel('isAccelerometerAvailable', true);
 
-    final isAvailable = await isAccelerometerAvailable;
+    final isAvailable = await methodChannel.isAccelerometerAvailable;
 
     expect(isAvailable, true);
   });
@@ -119,7 +45,7 @@ void main() {
     _initializeFakeMethodChannel('setGyroscopeSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await gyroscopeEventStream().first;
+    final event = await methodChannel.gyroscopeEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -131,7 +57,7 @@ void main() {
   test('isGyroscopeAvailable are working', () async {
     _initializeFakeMethodChannel('isGyroscopeAvailable', true);
 
-    final isAvailable = await isGyroscopeAvailable;
+    final isAvailable = await methodChannel.isGyroscopeAvailable;
 
     expect(isAvailable, true);
   });
@@ -143,7 +69,7 @@ void main() {
     _initializeFakeMethodChannel('setUserAccelerometerSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await userAccelerometerEventStream().first;
+    final event = await methodChannel.userAccelerometerEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -155,7 +81,7 @@ void main() {
   test('isUserAccelerometerAvailable are working', () async {
     _initializeFakeMethodChannel('isUserAccelerometerAvailable', true);
 
-    final isAvailable = await isUserAccelerometerAvailable;
+    final isAvailable = await methodChannel.isUserAccelerometerAvailable;
 
     expect(isAvailable, true);
   });
@@ -167,7 +93,7 @@ void main() {
     _initializeFakeMethodChannel('setGravitySamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await gravityEventStream().first;
+    final event = await methodChannel.gravityEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -179,7 +105,7 @@ void main() {
   test('isGravityAvailable are working', () async {
     _initializeFakeMethodChannel('isGravityAvailable', true);
 
-    final isAvailable = await isGravityAvailable;
+    final isAvailable = await methodChannel.isGravityAvailable;
 
     expect(isAvailable, true);
   });
@@ -191,7 +117,7 @@ void main() {
     _initializeFakeMethodChannel('setMagnetometerSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await magnetometerEventStream().first;
+    final event = await methodChannel.magnetometerEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -203,7 +129,173 @@ void main() {
   test('isMagnetometerAvailable are working', () async {
     _initializeFakeMethodChannel('isMagnetometerAvailable', true);
 
-    final isAvailable = await isMagnetometerAvailable;
+    final isAvailable = await methodChannel.isMagnetometerAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('absoluteOrientationEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_orientation';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setAbsoluteOrientationSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await methodChannel.absoluteOrientationEventStream().first;
+
+    expect(event.pitch, sensorData[0]);
+    expect(event.roll, sensorData[1]);
+    expect(event.yaw, sensorData[2]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isAbsoluteOrientationAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteOrientationAvailable', true);
+
+    final isAvailable = await methodChannel.isAbsoluteOrientationSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('orientationEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/orientation';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setOrientationSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await methodChannel.orientationEventStream().first;
+
+    expect(event.pitch, sensorData[0]);
+    expect(event.roll, sensorData[1]);
+    expect(event.yaw, sensorData[2]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isOrientationAvailable are working', () async {
+    _initializeFakeMethodChannel('isOrientationAvailable', true);
+
+    final isAvailable = await methodChannel.isOrientationSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('absoluteRotationQuaternionEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 12.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setAbsoluteRotationQuaternionSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await methodChannel.absoluteRotationQuaternionEventStream().first;
+
+    expect(event.x, sensorData[0]);
+    expect(event.y, sensorData[1]);
+    expect(event.z, sensorData[2]);
+    expect(event.w, sensorData[3]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isAbsoluteRotationQuaternionAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteRotationQuaternionAvailable', true);
+
+    final isAvailable = await methodChannel.isAbsoluteRotationQuaternionSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('rotationQuaternionEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/rotation_quaternion';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 12.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setRotationQuaternionSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await methodChannel.rotationQuaternionEventStream().first;
+
+    expect(event.x, sensorData[0]);
+    expect(event.y, sensorData[1]);
+    expect(event.z, sensorData[2]);
+    expect(event.w, sensorData[3]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isRotationQuaternionAvailable are working', () async {
+    _initializeFakeMethodChannel('isRotationQuaternionAvailable', true);
+
+    final isAvailable = await methodChannel.isRotationQuaternionSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('absoluteRotationMatrixEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_rotation_matrix';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[
+      9.0,
+      10.0,
+      11.0,
+      12.0,
+      13.0,
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      1.0,
+      timestamp.microsecondsSinceEpoch.toDouble()
+    ];
+    _initializeFakeMethodChannel('setAbsoluteRotationMatrixSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await methodChannel.absoluteRotationMatrixEventStream().first;
+
+    expect(event.rotationMatrix, Matrix3.fromList(sensorData.sublist(0, 9)));
+    expect(event.accuracy, Accuracy.low);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isAbsoluteRotationMatrixAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteRotationMatrixAvailable', true);
+
+    final isAvailable = await methodChannel.isAbsoluteRotationMatrixSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('rotationMatrixEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/rotation_matrix';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[
+      9.0,
+      10.0,
+      11.0,
+      12.0,
+      13.0,
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      1.0,
+      timestamp.microsecondsSinceEpoch.toDouble()
+    ];
+    _initializeFakeMethodChannel('setRotationMatrixSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await methodChannel.rotationMatrixEventStream().first;
+
+    expect(event.rotationMatrix, Matrix3.fromList(sensorData.sublist(0, 9)));
+    expect(event.accuracy, Accuracy.low);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isRotationMatrixAvailable are working', () async {
+    _initializeFakeMethodChannel('isRotationMatrixAvailable', true);
+
+    final isAvailable = await methodChannel.isRotationMatrixSensorAvailable;
 
     expect(isAvailable, true);
   });
@@ -213,8 +305,7 @@ void _initializeFakeMethodChannel(String methodName, [dynamic returnValue]) {
   const standardMethod = StandardMethodCodec();
 
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMessageHandler('dev.fluttercommunity.plus/sensors/method',
-          (ByteData? message) async {
+      .setMockMessageHandler('dev.fluttercommunity.plus/sensors/method', (ByteData? message) async {
     final methodCall = standardMethod.decodeMethodCall(message);
     if (methodCall.method == methodName) {
       return standardMethod.encodeSuccessEnvelope(returnValue);
@@ -228,16 +319,15 @@ void _initializeFakeSensorChannel(String channelName, List<double> sensorData) {
   const standardMethod = StandardMethodCodec();
 
   void emitEvent(ByteData? event) {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .handlePlatformMessage(
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
       channelName,
       event,
       (ByteData? reply) {},
     );
   }
 
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMessageHandler(channelName, (ByteData? message) async {
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMessageHandler(channelName,
+      (ByteData? message) async {
     final methodCall = standardMethod.decodeMethodCall(message);
     if (methodCall.method == 'listen') {
       emitEvent(standardMethod.encodeSuccessEnvelope(sensorData));

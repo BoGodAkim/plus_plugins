@@ -12,11 +12,13 @@ var _motionManager: CMMotionManager!
 
 public protocol MotionStreamHandler: FlutterStreamHandler {
     var samplingPeriod: Int { get set }
+    func isAvailable() -> Bool
 }
 
 func _initMotionManager() {
     if (_motionManager == nil) {
         _motionManager = CMMotionManager()
+        _motionManager.showsDeviceMovementDisplay = true
         _motionManager.accelerometerUpdateInterval = 0.2
         _motionManager.deviceMotionUpdateInterval = 0.2
         _motionManager.gyroUpdateInterval = 0.2
@@ -31,12 +33,13 @@ func sendData(data: Array<Float64>, sink: @escaping FlutterEventSink) {
     // Even after [detachFromEngineForRegistrar] some events may still be received
     // and fired until fully detached.
 
+    var duplicatedData = data
     // IOS doesn't have accuracy data, so we send -1 (unknown) instead.
-    data += Float64(-1)
-    data += Float64((Date().timeIntervalSince1970 * 1000000).rounded())
+    duplicatedData += [Float64(-1)]
+    duplicatedData += [Float64((Date().timeIntervalSince1970 * 1000000).rounded())]
 
     DispatchQueue.main.async {
-        data.withUnsafeBufferPointer { buffer in
+        duplicatedData.withUnsafeBufferPointer { buffer in
             sink(FlutterStandardTypedData.init(float64: Data(buffer: buffer)))
         }
     }
@@ -52,7 +55,7 @@ class FPPAccelerometerStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func isAvailable() -> Bool {
-        return _motionManager.isAccelerometerAvailable
+        return CMMotionManager().isAccelerometerAvailable
     }
 
     func onListen(
@@ -107,7 +110,7 @@ class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func isAvailable() -> Bool {
-        return _motionManager.isDeviceMotionAvailable
+        return CMMotionManager().isDeviceMotionAvailable
     }
 
     func onListen(
@@ -162,7 +165,7 @@ class FPPGravityStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func isAvailable() -> Bool {
-        return _motionManager.isDeviceMotionAvailable
+        return CMMotionManager().isDeviceMotionAvailable
     }
 
     func onListen(
@@ -217,7 +220,7 @@ class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func isAvailable() -> Bool {
-        return _motionManager.isGyroAvailable
+        return CMMotionManager().isGyroAvailable
     }
 
     func onListen(
@@ -263,7 +266,7 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func isAvailable() -> Bool {
-        return _motionManager.isMagnetometerAvailable
+        return CMMotionManager().isMagnetometerAvailable
     }
 
     func onListen(
@@ -285,6 +288,196 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
             }
             let magneticField = data!.magneticField
             sendData(data: [magneticField.x, magneticField.y, magneticField.z ], sink: sink)
+        }
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        _motionManager.stopDeviceMotionUpdates()
+        return nil
+    }
+
+    func dealloc() {
+        FPPSensorsPlusPlugin._cleanUp()
+    }
+}
+
+class FPPOrientationStreamHandlerPlus: NSObject, MotionStreamHandler {
+    private var attitudeReferenceFrame: CMAttitudeReferenceFrame
+
+    init(_ referenceFrame: CMAttitudeReferenceFrame) {
+        attitudeReferenceFrame = referenceFrame
+    }
+
+    var samplingPeriod = 200000 {
+        didSet {
+            _initMotionManager()
+            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
+        }
+    }
+
+    func isAvailable() -> Bool {
+        let motionManager = CMMotionManager()
+        return motionManager.isDeviceMotionAvailable && motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
+    }
+
+    func onListen(
+            withArguments arguments: Any?,
+            eventSink sink: @escaping FlutterEventSink
+    ) -> FlutterError? {
+        _initMotionManager()
+        _motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
+            if _isCleanUp {
+                return
+            }
+            if (error != nil) {
+                sink(FlutterError(
+                        code: "UNAVAILABLE",
+                        message: error!.localizedDescription,
+                        details: nil
+                ))
+                return
+            }
+            let attitude = data!.attitude
+            if self.attitudeReferenceFrame == CMAttitudeReferenceFrame.xMagneticNorthZVertical {
+                // Remap y-axis to magnetic north instead of the x-axis,
+                // to align with Android.
+                attitude.yaw = (data!.attitude.yaw + Double.pi + Double.pi / 2).truncatingRemainder(dividingBy: Double.pi * 2) - Double.pi
+            }
+            sendData(
+                    data:[
+                        attitude.roll,
+                        attitude.pitch,
+                        attitude.yaw
+                        ],
+                    sink: sink
+            )
+        }
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        _motionManager.stopDeviceMotionUpdates()
+        return nil
+    }
+
+    func dealloc() {
+        FPPSensorsPlusPlugin._cleanUp()
+    }
+}
+
+public class FPPRotationQuaternionStreamHandlerPlus: NSObject, MotionStreamHandler {
+    private var attitudeReferenceFrame: CMAttitudeReferenceFrame
+
+    init(_ referenceFrame: CMAttitudeReferenceFrame) {
+        attitudeReferenceFrame = referenceFrame
+    }
+
+    var samplingPeriod = 200000 {
+        didSet {
+            _initMotionManager()
+            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
+        }
+    }
+
+    func isAvailable() -> Bool {
+        let motionManager = CMMotionManager()
+        return motionManager.isDeviceMotionAvailable && motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
+    }
+
+    func onListen(
+            withArguments arguments: Any?,
+            eventSink sink: @escaping FlutterEventSink
+    ) -> FlutterError? {
+        _initMotionManager()
+        _motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
+            if _isCleanUp {
+                return
+            }
+            if (error != nil) {
+                sink(FlutterError(
+                        code: "UNAVAILABLE",
+                        message: error!.localizedDescription,
+                        details: nil
+                ))
+                return
+            }
+            let quaternion = data!.attitude.quaternion
+            sendData(
+                    data:[
+                        quaternion.x,
+                        quaternion.y,
+                        quaternion.z,
+                        quaternion.w
+                        ],
+                    sink: sink
+            )
+        }
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        _motionManager.stopDeviceMotionUpdates()
+        return nil
+    }
+
+    func dealloc() {
+        FPPSensorsPlusPlugin._cleanUp()
+    }
+}
+
+
+public class FPPRotationMatrixStreamHandlerPlus: NSObject, MotionStreamHandler {
+    private var attitudeReferenceFrame: CMAttitudeReferenceFrame
+
+    init(_ referenceFrame: CMAttitudeReferenceFrame) {
+        attitudeReferenceFrame = referenceFrame
+    }
+
+    var samplingPeriod = 200000 {
+        didSet {
+            _initMotionManager()
+            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
+        }
+    }
+
+    func isAvailable() -> Bool {
+        let motionManager = CMMotionManager()
+        return motionManager.isDeviceMotionAvailable && motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
+    }
+
+    func onListen(
+            withArguments arguments: Any?,
+            eventSink sink: @escaping FlutterEventSink
+    ) -> FlutterError? {
+        _initMotionManager()
+        _motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
+            if _isCleanUp {
+                return
+            }
+            if (error != nil) {
+                sink(FlutterError(
+                        code: "UNAVAILABLE",
+                        message: error!.localizedDescription,
+                        details: nil
+                ))
+                return
+            }
+            let rotationMatrix = data!.attitude.rotationMatrix
+            sendData(
+                    data:[
+                        rotationMatrix.m11,
+                        rotationMatrix.m12,
+                        rotationMatrix.m13,
+                        rotationMatrix.m21,
+                        rotationMatrix.m22,
+                        rotationMatrix.m23,
+                        rotationMatrix.m31,
+                        rotationMatrix.m32,
+                        rotationMatrix.m33
+                        ],
+                    sink: sink
+            )
         }
         return nil
     }

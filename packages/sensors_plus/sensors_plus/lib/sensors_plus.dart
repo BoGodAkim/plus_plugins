@@ -34,7 +34,6 @@ Stream<MagnetometerEvent> get magnetometerEvents {
 
 /// Returns a broadcast stream of events from the device accelerometer at the
 /// given sampling frequency.
-@override
 Stream<AccelerometerEvent> accelerometerEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
@@ -42,14 +41,12 @@ Stream<AccelerometerEvent> accelerometerEventStream({
 }
 
 /// Returns a boolean value indicating whether the accelerometer is available.
-@override
 Future<bool> get isAccelerometerAvailable async {
   return await _sensors.isAccelerometerAvailable;
 }
 
 /// Returns a broadcast stream of events from the device gyroscope at the
 /// given sampling frequency.
-@override
 Stream<GyroscopeEvent> gyroscopeEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
@@ -57,14 +54,12 @@ Stream<GyroscopeEvent> gyroscopeEventStream({
 }
 
 /// Returns a boolean value indicating whether the gyroscope is available.
-@override
 Future<bool> get isGyroscopeAvailable async {
   return await _sensors.isGyroscopeAvailable;
 }
 
 /// Returns a broadcast stream of events from the device accelerometer with
 /// gravity removed at the given sampling frequency.
-@override
 Stream<UserAccelerometerEvent> userAccelerometerEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
@@ -73,14 +68,12 @@ Stream<UserAccelerometerEvent> userAccelerometerEventStream({
 
 /// Returns a boolean value indicating whether the user accelerometer is
 /// available.
-@override
 Future<bool> get isUserAccelerometerAvailable async {
   return await _sensors.isUserAccelerometerAvailable;
 }
 
 /// Returns a broadcast stream of events from the device gravity sensor at the
 /// given sampling frequency.
-@override
 Stream<GravityEvent> gravityEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
@@ -89,14 +82,12 @@ Stream<GravityEvent> gravityEventStream({
 
 /// Returns a boolean value indicating whether the gravity sensor is
 /// available.
-@override
 Future<bool> get isGravityAvailable async {
   return await _sensors.isGravityAvailable;
 }
 
 /// Returns a broadcast stream of events from the device magnetometer at the
 /// given sampling frequency.
-@override
 Stream<MagnetometerEvent> magnetometerEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
@@ -104,7 +95,90 @@ Stream<MagnetometerEvent> magnetometerEventStream({
 }
 
 /// Returns a boolean value indicating whether the magnetometer is available.
-@override
 Future<bool> get isMagnetometerAvailable async {
   return await _sensors.isMagnetometerAvailable;
+}
+
+/// Returns a broadcast stream of events from the device absolute orientation
+/// sensor at the given sampling frequency.
+Stream<AbsoluteOrientationEvent> absoluteOrientationEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.absoluteOrientationEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the absolute orientation sensor
+/// is available.
+Future<bool> get isAbsoluteOrientationSensorAvailable {
+  return _sensors.isAbsoluteOrientationSensorAvailable;
+}
+
+/// Returns a broadcast stream of events from the device orientation sensor at
+/// the given sampling frequency.
+Stream<OrientationEvent> orientationEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.orientationEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the orientation sensor is
+/// available.
+Future<bool> get isOrientationSensorAvailable {
+  return _sensors.isOrientationSensorAvailable;
+}
+
+/// Returns a broadcast stream of events from the device absolute rotation
+/// quaternion sensor at the given sampling frequency.
+Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.absoluteRotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the absolute rotation
+/// quaternion sensor is available.
+Future<bool> get isAbsoluteRotationQuaternionSensorAvailable {
+  return _sensors.isAbsoluteRotationQuaternionSensorAvailable;
+}
+
+/// Returns a broadcast stream of events from the device rotation quaternion
+/// sensor at the given sampling frequency.
+Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.rotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the rotation quaternion sensor
+/// is available.
+Future<bool> get isRotationQuaternionSensorAvailable {
+  return _sensors.isRotationQuaternionSensorAvailable;
+}
+
+/// Returns a broadcast stream of events from the device absolute rotation
+/// matrix sensor at the given sampling frequency.
+Stream<AbsoluteRotationMatrixEvent> absoluteRotationMatrixEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.absoluteRotationMatrixEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the absolute rotation matrix
+/// sensor is available.
+Future<bool> get isAbsoluteRotationMatrixSensorAvailable {
+  return _sensors.isAbsoluteRotationMatrixSensorAvailable;
+}
+
+/// Returns a broadcast stream of events from the device rotation matrix
+/// sensor at the given sampling frequency.
+Stream<RotationMatrixEvent> rotationMatrixEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.rotationMatrixEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the rotation matrix sensor is
+/// available.
+Future<bool> get isRotationMatrixSensorAvailable {
+  return _sensors.isRotationMatrixSensorAvailable;
 }

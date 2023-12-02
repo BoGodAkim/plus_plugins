@@ -18,12 +18,24 @@ class SensorsPlugin : FlutterPlugin {
     private lateinit var gravityChannel: EventChannel
     private lateinit var gyroscopeChannel: EventChannel
     private lateinit var magnetometerChannel: EventChannel
+    private lateinit var orientationChannel: EventChannel
+    private lateinit var absoluteOrientationChannel: EventChannel
+    private lateinit var rotationQuaternionChannel: EventChannel
+    private lateinit var absoluteRotationQuaternionChannel: EventChannel
+    private lateinit var rotationMatrixChannel: EventChannel
+    private lateinit var absoluteRotationMatrixChannel: EventChannel
 
     private lateinit var accelerometerStreamHandler: StreamHandlerImpl
     private lateinit var userAccelStreamHandler: StreamHandlerImpl
     private lateinit var gravityStreamHandler: StreamHandlerImpl
     private lateinit var gyroscopeStreamHandler: StreamHandlerImpl
     private lateinit var magnetometerStreamHandler: StreamHandlerImpl
+    private lateinit var orientationStreamHandler: OrientationStreamHandlerImpl
+    private lateinit var absoluteOrientationStreamHandler: OrientationStreamHandlerImpl
+    private lateinit var rotationQuaternionStreamHandler: RotationQuaternionStreamHandlerImpl
+    private lateinit var absoluteRotationQuaternionStreamHandler: RotationQuaternionStreamHandlerImpl
+    private lateinit var rotationMatrixStreamHandler: RotationMatrixStreamHandlerImpl
+    private lateinit var absoluteRotationMatrixStreamHandler: RotationMatrixStreamHandlerImpl
 
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
         setupMethodChannel(binding.binaryMessenger)
@@ -46,6 +58,12 @@ class SensorsPlugin : FlutterPlugin {
                         "isGravityAvailable" -> gravityStreamHandler
                         "isGyroscopeAvailable" -> gyroscopeStreamHandler
                         "isMagnetometerAvailable" -> magnetometerStreamHandler
+                        "isOrientationAvailable" -> orientationStreamHandler
+                        "isAbsoluteOrientationAvailable" -> absoluteOrientationStreamHandler
+                        "isRotationQuaternionAvailable" -> rotationQuaternionStreamHandler
+                        "isAbsoluteRotationQuaternionAvailable" -> absoluteRotationQuaternionStreamHandler
+                        "isRotationMatrixAvailable" -> rotationMatrixStreamHandler
+                        "isAbsoluteRotationMatrixAvailable" -> absoluteRotationMatrixStreamHandler
                         else -> null
                     }
                     if (streamHandler != null) {
@@ -61,6 +79,12 @@ class SensorsPlugin : FlutterPlugin {
                         "setGravitySamplingPeriod" -> gravityStreamHandler
                         "setGyroscopeSamplingPeriod" -> gyroscopeStreamHandler
                         "setMagnetometerSamplingPeriod" -> magnetometerStreamHandler
+                        "setOrientationSamplingPeriod" -> orientationStreamHandler
+                        "setAbsoluteOrientationSamplingPeriod" -> absoluteOrientationStreamHandler
+                        "setRotationQuaternionSamplingPeriod" -> rotationQuaternionStreamHandler
+                        "setAbsoluteRotationQuaternionSamplingPeriod" -> absoluteRotationQuaternionStreamHandler
+                        "setRotationMatrixSamplingPeriod" -> rotationMatrixStreamHandler
+                        "setAbsoluteRotationMatrixSamplingPeriod" -> absoluteRotationMatrixStreamHandler
                         else -> null
                     }
                     streamHandler?.samplingPeriod = call.arguments as Int
@@ -96,7 +120,7 @@ class SensorsPlugin : FlutterPlugin {
         )
         userAccelChannel.setStreamHandler(userAccelStreamHandler)
 
-        gravityChannel = EventChannel(messenger, "dev.fluttercommunity.plus/sensors/gravity")
+        gravityChannel = EventChannel(messenger, GRAVITY_CHANNEL_NAME)
         gravityStreamHandler = StreamHandlerImpl(
             sensorsManager,
             Sensor.TYPE_GRAVITY
@@ -116,6 +140,48 @@ class SensorsPlugin : FlutterPlugin {
             Sensor.TYPE_MAGNETIC_FIELD
         )
         magnetometerChannel.setStreamHandler(magnetometerStreamHandler)
+
+        orientationChannel = EventChannel(messenger, ORIENTATION_CHANNEL_NAME)
+        orientationStreamHandler = OrientationStreamHandlerImpl(
+            sensorsManager,
+            Sensor.TYPE_GAME_ROTATION_VECTOR
+        )
+        orientationChannel.setStreamHandler(orientationStreamHandler)
+
+        absoluteOrientationChannel = EventChannel(messenger, ABSOLUTE_ORIENTATION_CHANNEL_NAME)
+        absoluteOrientationStreamHandler = OrientationStreamHandlerImpl(
+            sensorsManager,
+            Sensor.TYPE_ROTATION_VECTOR
+        )
+        absoluteOrientationChannel.setStreamHandler(absoluteOrientationStreamHandler)
+
+        rotationQuaternionChannel = EventChannel(messenger, ROTATION_QUATERNION_CHANNEL_NAME)
+        rotationQuaternionStreamHandler = RotationQuaternionStreamHandlerImpl(
+            sensorsManager,
+            Sensor.TYPE_GAME_ROTATION_VECTOR
+        )
+        rotationQuaternionChannel.setStreamHandler(rotationQuaternionStreamHandler)
+
+        absoluteRotationQuaternionChannel = EventChannel(messenger, ABSOLUTE_ROTATION_QUATERNION_CHANNEL_NAME)
+        absoluteRotationQuaternionStreamHandler = RotationQuaternionStreamHandlerImpl(
+            sensorsManager,
+            Sensor.TYPE_ROTATION_VECTOR
+        )
+        absoluteRotationQuaternionChannel.setStreamHandler(absoluteRotationQuaternionStreamHandler)
+
+        rotationMatrixChannel = EventChannel(messenger, ROTATION_MATRIX_CHANNEL_NAME)
+        rotationMatrixStreamHandler = RotationMatrixStreamHandlerImpl(
+            sensorsManager,
+            Sensor.TYPE_GAME_ROTATION_VECTOR
+        )
+        rotationMatrixChannel.setStreamHandler(rotationMatrixStreamHandler)
+
+        absoluteRotationMatrixChannel = EventChannel(messenger, ABSOLUTE_ROTATION_MATRIX_CHANNEL_NAME)
+        absoluteRotationMatrixStreamHandler = RotationMatrixStreamHandlerImpl(
+            sensorsManager,
+            Sensor.TYPE_ROTATION_VECTOR
+        )
+        absoluteRotationMatrixChannel.setStreamHandler(absoluteRotationMatrixStreamHandler)
     }
 
     private fun teardownEventChannels() {
@@ -124,12 +190,24 @@ class SensorsPlugin : FlutterPlugin {
         gravityChannel.setStreamHandler(null)
         gyroscopeChannel.setStreamHandler(null)
         magnetometerChannel.setStreamHandler(null)
+        orientationChannel.setStreamHandler(null)
+        absoluteOrientationChannel.setStreamHandler(null)
+        rotationQuaternionChannel.setStreamHandler(null)
+        absoluteRotationQuaternionChannel.setStreamHandler(null)
+        rotationMatrixChannel.setStreamHandler(null)
+        absoluteRotationMatrixChannel.setStreamHandler(null)
 
         accelerometerStreamHandler.onCancel(null)
         userAccelStreamHandler.onCancel(null)
         gravityStreamHandler.onCancel(null)
         gyroscopeStreamHandler.onCancel(null)
         magnetometerStreamHandler.onCancel(null)
+        orientationStreamHandler.onCancel(null)
+        absoluteOrientationStreamHandler.onCancel(null)
+        rotationQuaternionStreamHandler.onCancel(null)
+        absoluteRotationQuaternionStreamHandler.onCancel(null)
+        rotationMatrixStreamHandler.onCancel(null)
+        absoluteRotationMatrixStreamHandler.onCancel(null)
     }
 
     companion object {
@@ -145,5 +223,17 @@ class SensorsPlugin : FlutterPlugin {
             "dev.fluttercommunity.plus/sensors/gyroscope"
         private const val MAGNETOMETER_CHANNEL_NAME =
             "dev.fluttercommunity.plus/sensors/magnetometer"
+        private const val ORIENTATION_CHANNEL_NAME =
+            "dev.fluttercommunity.plus/sensors/orientation"
+        private const val ABSOLUTE_ORIENTATION_CHANNEL_NAME =
+            "dev.fluttercommunity.plus/sensors/absolute_orientation"
+        private const val ROTATION_QUATERNION_CHANNEL_NAME =
+            "dev.fluttercommunity.plus/sensors/rotation_quaternion"
+        private const val ABSOLUTE_ROTATION_QUATERNION_CHANNEL_NAME =
+            "dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion"
+        private const val ROTATION_MATRIX_CHANNEL_NAME =
+            "dev.fluttercommunity.plus/sensors/rotation_matrix"
+        private const val ABSOLUTE_ROTATION_MATRIX_CHANNEL_NAME =
+            "dev.fluttercommunity.plus/sensors/absolute_rotation_matrix"
     }
 }

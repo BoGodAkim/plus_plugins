@@ -8,15 +8,15 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
 import java.time.Instant
 
-internal class StreamHandlerImpl(
-    private val sensorManager: SensorManager,
-    private val sensorType: Int
+open internal class StreamHandlerImpl(
+    protected val sensorManager: SensorManager,
+    protected val sensorType: Int
 ) : EventChannel.StreamHandler {
-    private var sensorEventListener: SensorEventListener? = null
+    protected var sensorEventListener: SensorEventListener? = null
 
-    private var sensor: Sensor? = null
+    protected var sensor: Sensor? = null
 
-    private var accuracy: Int = -1
+    protected var accuracy: Int = -1
 
     var samplingPeriod = 200000
         set(value) {
@@ -49,14 +49,14 @@ internal class StreamHandlerImpl(
         }
     }
 
-    private fun updateRegistration() {
+    protected fun updateRegistration() {
         if (sensorEventListener != null) {
             sensorManager.unregisterListener(sensorEventListener)
             sensorManager.registerListener(sensorEventListener, sensor, samplingPeriod)
         }
     }
 
-    private fun getSensorName(sensorType: Int): String {
+    open protected fun getSensorName(sensorType: Int): String {
         return when (sensorType) {
             Sensor.TYPE_ACCELEROMETER -> "Accelerometer"
             Sensor.TYPE_LINEAR_ACCELERATION -> "User Accelerometer"
@@ -67,7 +67,7 @@ internal class StreamHandlerImpl(
         }
     }
 
-    private fun createSensorEventListener(events: EventSink): SensorEventListener {
+    open protected fun createSensorEventListener(events: EventSink): SensorEventListener {
         return object : SensorEventListener {
             override fun onAccuracyChanged(sensor: Sensor, newAccuracy: Int) {
                 accuracy = newAccuracy
@@ -86,3 +86,117 @@ internal class StreamHandlerImpl(
         }
     }
 }
+
+internal class OrientationStreamHandlerImpl(
+    sensorManager: SensorManager,
+    sensorType: Int
+) : StreamHandlerImpl(sensorManager, sensorType) {
+
+    override protected fun getSensorName(sensorType: Int): String {
+        return when (sensorType) {
+            Sensor.TYPE_ROTATION_VECTOR -> "Absolute Orientation"
+            Sensor.TYPE_GAME_ROTATION_VECTOR -> "Orientation"
+            else -> "Undefined"
+        }
+    }
+
+    override protected fun createSensorEventListener(events: EventSink): SensorEventListener {
+        return object : SensorEventListener {
+            override fun onAccuracyChanged(sensor: Sensor, newAccuracy: Int) {
+                accuracy = newAccuracy
+            }
+
+            override fun onSensorChanged(event: SensorEvent) {
+                val sensorValues = DoubleArray(5)
+                var matrix = FloatArray(9)
+                SensorManager.getRotationMatrixFromVector(matrix, event!!.values)
+                // TODO: check if this is necessary
+                // if (matrix[7] > 1.0f) matrix[7] = 1.0f
+                // if (matrix[7] < -1.0f) matrix[7] = -1.0f
+                var orientation = FloatArray(3)
+                SensorManager.getOrientation(matrix, orientation)
+                // TODO: check if this is necessary
+                sensorValues[0] = -orientation[1].toDouble()
+                sensorValues[1] = orientation[2].toDouble()
+                sensorValues[2] = -orientation[0].toDouble()
+                sensorValues[3] = accuracy.toDouble()
+                val instant = Instant.now()
+                sensorValues[4] = (instant.getEpochSecond() * 1000_000 + instant.getNano() / 1000).toDouble();
+                events.success(sensorValues)
+            }
+        }
+    }
+}
+
+internal class RotationQuaternionStreamHandlerImpl(
+    sensorManager: SensorManager,
+    sensorType: Int
+) : StreamHandlerImpl(sensorManager, sensorType) {
+
+    override protected fun getSensorName(sensorType: Int): String {
+        return when (sensorType) {
+            Sensor.TYPE_ROTATION_VECTOR -> "Absolute Rotation Quaternion"
+            Sensor.TYPE_GAME_ROTATION_VECTOR -> "Rotation Quaternion"
+            else -> "Undefined"
+        }
+    }
+
+    override protected fun createSensorEventListener(events: EventSink): SensorEventListener {
+        return object : SensorEventListener {
+            override fun onAccuracyChanged(sensor: Sensor, newAccuracy: Int) {
+                accuracy = newAccuracy
+            }
+
+            override fun onSensorChanged(event: SensorEvent) {
+                val sensorValues = DoubleArray(6)
+                val quaternion = FloatArray(4)
+                SensorManager.getQuaternionFromVector(quaternion, event!!.values)
+                // change order from (w, x, y, z) to (x, y, z, w)
+                sensorValues[0] = quaternion[1].toDouble()
+                sensorValues[1] = quaternion[2].toDouble()
+                sensorValues[2] = quaternion[3].toDouble()
+                sensorValues[3] = quaternion[0].toDouble()
+                sensorValues[4] = accuracy.toDouble()
+                val instant = Instant.now()
+                sensorValues[5] = (instant.getEpochSecond() * 1000_000 + instant.getNano() / 1000).toDouble();
+                events.success(sensorValues)
+            }
+        }
+    }
+}
+
+internal class RotationMatrixStreamHandlerImpl(
+    sensorManager: SensorManager,
+    sensorType: Int
+) : StreamHandlerImpl(sensorManager, sensorType) {
+
+    override protected fun getSensorName(sensorType: Int): String {
+        return when (sensorType) {
+            Sensor.TYPE_ROTATION_VECTOR -> "Absolute Rotation Matrix"
+            Sensor.TYPE_GAME_ROTATION_VECTOR -> "Rotation Matrix"
+            else -> "Undefined"
+        }
+    }
+
+    override protected fun createSensorEventListener(events: EventSink): SensorEventListener {
+        return object : SensorEventListener {
+            override fun onAccuracyChanged(sensor: Sensor, newAccuracy: Int) {
+                accuracy = newAccuracy
+            }
+
+            override fun onSensorChanged(event: SensorEvent) {
+                val sensorValues = DoubleArray(11)
+                var matrix = FloatArray(9)
+                SensorManager.getRotationMatrixFromVector(matrix, event!!.values)
+                matrix.forEachIndexed { index, value ->
+                    sensorValues[index] = value.toDouble()
+                }
+                sensorValues[9] = accuracy.toDouble()
+                val instant = Instant.now()
+                sensorValues[10] = (instant.getEpochSecond() * 1000_000 + instant.getNano() / 1000).toDouble();
+                events.success(sensorValues)
+            }
+        }
+    }
+}
+                

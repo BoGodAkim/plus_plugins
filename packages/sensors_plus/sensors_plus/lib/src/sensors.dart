@@ -61,8 +61,7 @@ class Sensors extends SensorsPlatform {
   Stream<UserAccelerometerEvent> userAccelerometerEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    return _platform.userAccelerometerEventStream(
-        samplingPeriod: samplingPeriod);
+    return _platform.userAccelerometerEventStream(samplingPeriod: samplingPeriod);
   }
 
   /// Returns a boolean value indicating whether the user accelerometer is
@@ -74,7 +73,7 @@ class Sensors extends SensorsPlatform {
 
   /// Returns a broadcast stream of events from the device gravity sensor at the
   /// given sampling frequency.
-  /// 
+  ///
   /// This method always returning the same stream. If this method is called
   /// again, the sampling period of the stream will be update. All previous
   /// listener will also be affected.
@@ -109,5 +108,125 @@ class Sensors extends SensorsPlatform {
   @override
   Future<bool> get isMagnetometerAvailable async {
     return await _platform.isMagnetometerAvailable;
+  }
+
+  /// Returns a broadcast stream of events from the device orientation sensor at
+  /// the given sampling frequency.
+  ///
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<OrientationEvent> orientationEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.orientationEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the orientation sensor is
+  /// available.
+  @override
+  Future<bool> get isOrientationSensorAvailable async {
+    return await _platform.isOrientationSensorAvailable;
+  }
+
+  /// Returns a broadcast stream of events from the device absolute orientation
+  /// sensor at the given sampling frequency.
+  ///
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<AbsoluteOrientationEvent> absoluteOrientationEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.absoluteOrientationEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the absolute orientation sensor
+  /// is available.
+  @override
+  Future<bool> get isAbsoluteOrientationSensorAvailable async {
+    return await _platform.isAbsoluteOrientationSensorAvailable;
+  }
+
+  /// Returns a broadcast stream of events from the device rotation quaternion
+  /// sensor at the given sampling frequency.
+  ///
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.rotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the rotation quaternion sensor
+  /// is available.
+  @override
+  Future<bool> get isRotationQuaternionSensorAvailable async {
+    return await _platform.isRotationQuaternionSensorAvailable;
+  }
+
+  /// Returns a broadcast stream of events from the device absolute rotation
+  /// quaternion sensor at the given sampling frequency.
+  ///
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.absoluteRotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the absolute rotation
+  /// quaternion sensor is available.
+  @override
+  Future<bool> get isAbsoluteRotationQuaternionSensorAvailable async {
+    return await _platform.isAbsoluteRotationQuaternionSensorAvailable;
+  }
+
+  /// Returns a broadcast stream of events from the device game rotation
+  /// matrix sensor at the given sampling frequency.
+  ///
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<RotationMatrixEvent> rotationMatrixEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.rotationMatrixEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the rotation matrix sensor is
+  /// available.
+  @override
+  Future<bool> get isRotationMatrixSensorAvailable async {
+    return await _platform.isRotationMatrixSensorAvailable;
+  }
+
+  /// Returns a broadcast stream of events from the device absolute rotation
+  /// matrix sensor at the given sampling frequency.
+  ///
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<AbsoluteRotationMatrixEvent> absoluteRotationMatrixEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.absoluteRotationMatrixEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the absolute rotation matrix
+  /// sensor is available.
+  @override
+  Future<bool> get isAbsoluteRotationMatrixSensorAvailable async {
+    return await _platform.isAbsoluteRotationMatrixSensorAvailable;
   }
 }

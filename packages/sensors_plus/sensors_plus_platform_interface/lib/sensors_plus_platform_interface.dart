@@ -14,12 +14,24 @@ import 'src/gyroscope_event.dart';
 import 'src/magnetometer_event.dart';
 import 'src/user_accelerometer_event.dart';
 import 'src/gravity_event.dart';
+import 'src/absolute_orientation_event.dart';
+import 'src/orientation_event.dart';
+import 'src/absolute_rotation_quaternion_event.dart';
+import 'src/rotation_quaternion_event.dart';
+import 'src/absolute_rotation_matrix_event.dart';
+import 'src/rotation_matrix_event.dart';
 
 export 'src/accelerometer_event.dart';
 export 'src/gyroscope_event.dart';
 export 'src/magnetometer_event.dart';
 export 'src/user_accelerometer_event.dart';
 export 'src/gravity_event.dart';
+export 'src/absolute_orientation_event.dart';
+export 'src/orientation_event.dart';
+export 'src/absolute_rotation_quaternion_event.dart';
+export 'src/rotation_quaternion_event.dart';
+export 'src/absolute_rotation_matrix_event.dart';
+export 'src/rotation_matrix_event.dart';
 export 'src/sensor_interval.dart';
 export 'src/accuracy.dart';
 
@@ -77,8 +89,7 @@ abstract class SensorsPlatform extends PlatformInterface {
   Stream<AccelerometerEvent> accelerometerEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    throw UnimplementedError(
-        'listenToAccelerometerEvents has not been implemented.');
+    throw UnimplementedError('listenToAccelerometerEvents has not been implemented.');
   }
 
   /// Returns a boolean value indicating whether the accelerometer is available.
@@ -104,15 +115,13 @@ abstract class SensorsPlatform extends PlatformInterface {
   Stream<UserAccelerometerEvent> userAccelerometerEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    throw UnimplementedError(
-        'userAccelerometerEvents has not been implemented.');
+    throw UnimplementedError('userAccelerometerEvents has not been implemented.');
   }
 
   /// Returns a boolean value indicating whether the user accelerometer is
   /// available.
   Future<bool> get isUserAccelerometerAvailable {
-    throw UnimplementedError(
-        'isUserAccelerometerAvailable has not been implemented.');
+    throw UnimplementedError('isUserAccelerometerAvailable has not been implemented.');
   }
 
   /// Returns a broadcast stream of events from the device gravity sensor at the
@@ -140,5 +149,89 @@ abstract class SensorsPlatform extends PlatformInterface {
   /// Returns a boolean value indicating whether the magnetometer is available.
   Future<bool> get isMagnetometerAvailable {
     throw UnimplementedError('isMagnetometerAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device absolute orientation
+  /// sensor at the given sampling frequency.
+  Stream<AbsoluteOrientationEvent> absoluteOrientationEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('absoluteOrientationEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the absolute orientation sensor
+  /// is available.
+  Future<bool> get isAbsoluteOrientationSensorAvailable {
+    throw UnimplementedError('isAbsoluteOrientationSensorAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device orientation sensor at
+  /// the given sampling frequency.
+  Stream<OrientationEvent> orientationEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('orientationEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the orientation sensor is
+  /// available.
+  Future<bool> get isOrientationSensorAvailable {
+    throw UnimplementedError('isOrientationSensorAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device absolute rotation
+  /// quaternion sensor at the given sampling frequency.
+  Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('absoluteRotationQuaternionEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the absolute rotation
+  /// quaternion sensor is available.
+  Future<bool> get isAbsoluteRotationQuaternionSensorAvailable {
+    throw UnimplementedError('isAbsoluteRotationQuaternionSensorAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device rotation quaternion
+  /// sensor at the given sampling frequency.
+  Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('rotationQuaternionEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the rotation quaternion sensor
+  /// is available.
+  Future<bool> get isRotationQuaternionSensorAvailable {
+    throw UnimplementedError('isRotationQuaternionSensorAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device absolute rotation
+  /// matrix sensor at the given sampling frequency.
+  Stream<AbsoluteRotationMatrixEvent> absoluteRotationMatrixEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('absoluteRotationMatrixEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the absolute rotation matrix
+  /// sensor is available.
+  Future<bool> get isAbsoluteRotationMatrixSensorAvailable {
+    throw UnimplementedError('isAbsoluteRotationMatrixSensorAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device rotation matrix
+  /// sensor at the given sampling frequency.
+  Stream<RotationMatrixEvent> rotationMatrixEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('rotationMatrixEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the rotation matrix sensor is
+  /// available.
+  Future<bool> get isRotationMatrixSensorAvailable {
+    throw UnimplementedError('isRotationMatrixSensorAvailable has not been implemented.');
   }
 }

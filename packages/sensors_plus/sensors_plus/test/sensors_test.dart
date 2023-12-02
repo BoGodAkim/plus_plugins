@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart'
     show TestDefaultBinaryMessengerBinding, TestWidgetsFlutterBinding;
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:test/test.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -127,6 +128,172 @@ void main() {
     _initializeFakeMethodChannel('isMagnetometerAvailable', true);
 
     final isAvailable = await isMagnetometerAvailable;
+
+    expect(isAvailable, true);
+  });
+
+    test('absoluteOrientationEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_orientation';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setAbsoluteOrientationSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await absoluteOrientationEventStream().first;
+
+    expect(event.pitch, sensorData[0]);
+    expect(event.roll, sensorData[1]);
+    expect(event.yaw, sensorData[2]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isAbsoluteOrientationAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteOrientationAvailable', true);
+
+    final isAvailable = await isAbsoluteOrientationSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('orientationEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/orientation';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setOrientationSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await orientationEventStream().first;
+
+    expect(event.pitch, sensorData[0]);
+    expect(event.roll, sensorData[1]);
+    expect(event.yaw, sensorData[2]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isOrientationAvailable are working', () async {
+    _initializeFakeMethodChannel('isOrientationAvailable', true);
+
+    final isAvailable = await isOrientationSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('absoluteRotationQuaternionEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 12.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setAbsoluteRotationQuaternionSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await absoluteRotationQuaternionEventStream().first;
+
+    expect(event.x, sensorData[0]);
+    expect(event.y, sensorData[1]);
+    expect(event.z, sensorData[2]);
+    expect(event.w, sensorData[3]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isAbsoluteRotationQuaternionAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteRotationQuaternionAvailable', true);
+
+    final isAvailable = await isAbsoluteRotationQuaternionSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('rotationQuaternionEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/rotation_quaternion';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 12.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setRotationQuaternionSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await rotationQuaternionEventStream().first;
+
+    expect(event.x, sensorData[0]);
+    expect(event.y, sensorData[1]);
+    expect(event.z, sensorData[2]);
+    expect(event.w, sensorData[3]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isRotationQuaternionAvailable are working', () async {
+    _initializeFakeMethodChannel('isRotationQuaternionAvailable', true);
+
+    final isAvailable = await isRotationQuaternionSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('absoluteRotationMatrixEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_rotation_matrix';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[
+      9.0,
+      10.0,
+      11.0,
+      12.0,
+      13.0,
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      1.0,
+      timestamp.microsecondsSinceEpoch.toDouble()
+    ];
+    _initializeFakeMethodChannel('setAbsoluteRotationMatrixSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await absoluteRotationMatrixEventStream().first;
+
+    expect(event.rotationMatrix, Matrix3.fromList(sensorData.sublist(0, 9)));
+    expect(event.accuracy, Accuracy.low);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isAbsoluteRotationMatrixAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteRotationMatrixAvailable', true);
+
+    final isAvailable = await isAbsoluteRotationMatrixSensorAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('rotationMatrixEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/rotation_matrix';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[
+      9.0,
+      10.0,
+      11.0,
+      12.0,
+      13.0,
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      1.0,
+      timestamp.microsecondsSinceEpoch.toDouble()
+    ];
+    _initializeFakeMethodChannel('setRotationMatrixSamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await rotationMatrixEventStream().first;
+
+    expect(event.rotationMatrix, Matrix3.fromList(sensorData.sublist(0, 9)));
+    expect(event.accuracy, Accuracy.low);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isRotationMatrixAvailable are working', () async {
+    _initializeFakeMethodChannel('isRotationMatrixAvailable', true);
+
+    final isAvailable = await isRotationMatrixSensorAvailable;
 
     expect(isAvailable, true);
   });

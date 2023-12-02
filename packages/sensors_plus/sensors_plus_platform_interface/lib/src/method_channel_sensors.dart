@@ -18,12 +18,28 @@ class MethodChannelSensors extends SensorsPlatform {
   static const EventChannel _userAccelerometerEventChannel =
       EventChannel('dev.fluttercommunity.plus/sensors/user_accel');
 
-  static const EventChannel _gravityEventChannel =
-      EventChannel('dev.fluttercommunity.plus/sensors/gravity');
+  static const EventChannel _gravityEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/gravity');
 
   static const EventChannel _gyroscopeEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/gyroscope');
 
   static const EventChannel _magnetometerEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/magnetometer');
+
+  static const EventChannel _absoluteOrientationEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/absolute_orientation');
+
+  static const EventChannel _orientationEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/orientation');
+
+  static const EventChannel _absoluteRotationQuaternionEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion');
+
+  static const EventChannel _rotationQuaternionEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/rotation_quaternion');
+
+  static const EventChannel _absoluteRotationMatrixEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/absolute_rotation_matrix');
+
+  static const EventChannel _rotationMatrixEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/rotation_matrix');
 
   final logger = Logger('MethodChannelSensors');
   Stream<AccelerometerEvent>? _accelerometerEvents;
@@ -31,6 +47,12 @@ class MethodChannelSensors extends SensorsPlatform {
   Stream<UserAccelerometerEvent>? _userAccelerometerEvents;
   Stream<MagnetometerEvent>? _magnetometerEvents;
   Stream<GravityEvent>? _gravityEvents;
+  Stream<AbsoluteOrientationEvent>? _absoluteOrientationEvents;
+  Stream<OrientationEvent>? _orientationEvents;
+  Stream<AbsoluteRotationQuaternionEvent>? _absoluteRotationQuaternionEvents;
+  Stream<RotationQuaternionEvent>? _rotationQuaternionEvents;
+  Stream<AbsoluteRotationMatrixEvent>? _absoluteRotationMatrixEvents;
+  Stream<RotationMatrixEvent>? _rotationMatrixEvents;
 
   /// Returns a broadcast stream of events from the device accelerometer at the
   /// given sampling frequency.
@@ -66,7 +88,8 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return AccelerometerEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(), DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
+      return AccelerometerEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(),
+          DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
     });
     return _accelerometerEvents!;
   }
@@ -111,7 +134,8 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return GyroscopeEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(), DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
+      return GyroscopeEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(),
+          DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
     });
     return _gyroscopeEvents!;
   }
@@ -156,7 +180,8 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return UserAccelerometerEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(), DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
+      return UserAccelerometerEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(),
+          DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
     });
     return _userAccelerometerEvents!;
   }
@@ -202,7 +227,8 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return GravityEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(), DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
+      return GravityEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(),
+          DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
     });
     return _gravityEvents!;
   }
@@ -248,7 +274,8 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return MagnetometerEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(), DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
+      return MagnetometerEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(),
+          DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
     });
     return _magnetometerEvents!;
   }
@@ -257,5 +284,292 @@ class MethodChannelSensors extends SensorsPlatform {
   @override
   Future<bool> get isMagnetometerAvailable async {
     return await _methodChannel.invokeMethod('isMagnetometerAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device absolute orientation
+  /// sensor at the given sampling frequency.
+  @override
+  Stream<AbsoluteOrientationEvent> absoluteOrientationEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    var microseconds = samplingPeriod.inMicroseconds;
+    if (microseconds >= 1 && microseconds <= 3) {
+      logger.warning('The SamplingPeriod is currently set to $microsecondsμs, '
+          'which is a reserved value in Android. Please consider changing it '
+          'to either 0 or 4μs. See https://developer.android.com/reference/'
+          'android/hardware/SensorManager#registerListener(android.hardware.'
+          'SensorEventListener,%20android.hardware.Sensor,%20int) for more '
+          'information');
+      microseconds = 0;
+    }
+    _methodChannel.invokeMethod('setAbsoluteOrientationSamplingPeriod', microseconds);
+    _absoluteOrientationEvents ??= _absoluteOrientationEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[3].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return AbsoluteOrientationEvent(
+        list[0].toDouble(),
+        list[1].toDouble(),
+        list[2].toDouble(),
+        DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()),
+        accuracy,
+      );
+    });
+    return _absoluteOrientationEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the absolute orientation sensor
+  /// is available.
+  @override
+  Future<bool> get isAbsoluteOrientationSensorAvailable async {
+    return await _methodChannel.invokeMethod('isAbsoluteOrientationAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device orientation sensor at
+  /// the given sampling frequency.
+  @override
+  Stream<OrientationEvent> orientationEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    var microseconds = samplingPeriod.inMicroseconds;
+    if (microseconds >= 1 && microseconds <= 3) {
+      logger.warning('The SamplingPeriod is currently set to $microsecondsμs, '
+          'which is a reserved value in Android. Please consider changing it '
+          'to either 0 or 4μs. See https://developer.android.com/reference/'
+          'android/hardware/SensorManager#registerListener(android.hardware.'
+          'SensorEventListener,%20android.hardware.Sensor,%20int) for more '
+          'information');
+      microseconds = 0;
+    }
+    _methodChannel.invokeMethod('setOrientationSamplingPeriod', microseconds);
+    _orientationEvents ??= _orientationEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[3].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return OrientationEvent(
+        list[0].toDouble(),
+        list[1].toDouble(),
+        list[2].toDouble(),
+        DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()),
+        accuracy,
+      );
+    });
+    return _orientationEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the orientation sensor is
+  /// available.
+  @override
+  Future<bool> get isOrientationSensorAvailable async {
+    return await _methodChannel.invokeMethod('isOrientationAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device absolute rotation
+  /// quaternion sensor at the given sampling frequency.
+  @override
+  Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    _methodChannel.invokeMethod('setAbsoluteRotationQuaternionSamplingPeriod', samplingPeriod.inMicroseconds);
+    _absoluteRotationQuaternionEvents ??=
+        _absoluteRotationQuaternionEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[4].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return AbsoluteRotationQuaternionEvent(
+        list[0].toDouble(),
+        list[1].toDouble(),
+        list[2].toDouble(),
+        list[3].toDouble(),
+        DateTime.fromMicrosecondsSinceEpoch(list[5].toInt()),
+        accuracy,
+      );
+    });
+    return _absoluteRotationQuaternionEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the absolute rotation
+  /// quaternion sensor is available.
+  @override
+  Future<bool> get isAbsoluteRotationQuaternionSensorAvailable async {
+    return await _methodChannel.invokeMethod('isAbsoluteRotationQuaternionAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device rotation quaternion
+  /// sensor at the given sampling frequency.
+  @override
+  Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    _methodChannel.invokeMethod('setRotationQuaternionSamplingPeriod', samplingPeriod.inMicroseconds);
+    _rotationQuaternionEvents ??= _rotationQuaternionEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[4].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return RotationQuaternionEvent(
+        list[0].toDouble(),
+        list[1].toDouble(),
+        list[2].toDouble(),
+        list[3].toDouble(),
+        DateTime.fromMicrosecondsSinceEpoch(list[5].toInt()),
+        accuracy,
+      );
+    });
+    return _rotationQuaternionEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the rotation quaternion sensor
+  /// is available.
+  @override
+  Future<bool> get isRotationQuaternionSensorAvailable async {
+    return await _methodChannel.invokeMethod('isRotationQuaternionAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device absolute rotation
+  /// matrix sensor at the given sampling frequency.
+  @override
+  Stream<AbsoluteRotationMatrixEvent> absoluteRotationMatrixEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    _methodChannel.invokeMethod('setAbsoluteRotationMatrixSamplingPeriod', samplingPeriod.inMicroseconds);
+    _absoluteRotationMatrixEvents ??= _absoluteRotationMatrixEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[9].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return AbsoluteRotationMatrixEvent(
+        list[0].toDouble(),
+        list[1].toDouble(),
+        list[2].toDouble(),
+        list[3].toDouble(),
+        list[4].toDouble(),
+        list[5].toDouble(),
+        list[6].toDouble(),
+        list[7].toDouble(),
+        list[8].toDouble(),
+        DateTime.fromMicrosecondsSinceEpoch(list[10].toInt()),
+        accuracy,
+      );
+    });
+    return _absoluteRotationMatrixEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the absolute rotation matrix
+  /// sensor is available.
+  @override
+  Future<bool> get isAbsoluteRotationMatrixSensorAvailable async {
+    return await _methodChannel.invokeMethod('isAbsoluteRotationMatrixAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device rotation matrix
+  /// sensor at the given sampling frequency.
+  @override
+  Stream<RotationMatrixEvent> rotationMatrixEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    _methodChannel.invokeMethod('setRotationMatrixSamplingPeriod', samplingPeriod.inMicroseconds);
+    _rotationMatrixEvents ??= _rotationMatrixEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[9].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return RotationMatrixEvent(
+        list[0].toDouble(),
+        list[1].toDouble(),
+        list[2].toDouble(),
+        list[3].toDouble(),
+        list[4].toDouble(),
+        list[5].toDouble(),
+        list[6].toDouble(),
+        list[7].toDouble(),
+        list[8].toDouble(),
+        DateTime.fromMicrosecondsSinceEpoch(list[10].toInt()),
+        accuracy,
+      );
+    });
+    return _rotationMatrixEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the rotation matrix sensor is
+  /// available.
+  @override
+  Future<bool> get isRotationMatrixSensorAvailable async {
+    return await _methodChannel.invokeMethod('isRotationMatrixAvailable');
   }
 }
