@@ -152,6 +152,61 @@ class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 }
 
+class FPPGravityStreamHandlerPlus: NSObject, MotionStreamHandler {
+
+    var samplingPeriod = 200000 {
+        didSet {
+            _initMotionManager()
+            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
+        }
+    }
+
+    func isAvailable() -> Bool {
+        return _motionManager.isDeviceMotionAvailable
+    }
+
+    func onListen(
+            withArguments arguments: Any?,
+            eventSink sink: @escaping FlutterEventSink
+    ) -> FlutterError? {
+        _initMotionManager()
+        _motionManager.startDeviceMotionUpdates(to: OperationQueue()) { data, error in
+            if _isCleanUp {
+                return
+            }
+            if (error != nil) {
+                sink(FlutterError.init(
+                        code: "UNAVAILABLE",
+                        message: error!.localizedDescription,
+                        details: nil
+                ))
+                return
+            }
+            // Multiply by gravity, and adjust sign values to
+            // align with Android.
+            let acceleration = data!.gravity
+            sendData(
+                    data:[
+                        -acceleration.x * GRAVITY,
+                        -acceleration.y * GRAVITY,
+                        -acceleration.z * GRAVITY
+                        ],
+                    sink: sink
+            )
+        }
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        _motionManager.stopDeviceMotionUpdates()
+        return nil
+    }
+
+    func dealloc() {
+        FPPSensorsPlusPlugin._cleanUp()
+    }
+}
+
 class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
 
     var samplingPeriod = 200000 {

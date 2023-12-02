@@ -60,6 +60,7 @@ internal class StreamHandlerImpl(
         return when (sensorType) {
             Sensor.TYPE_ACCELEROMETER -> "Accelerometer"
             Sensor.TYPE_LINEAR_ACCELERATION -> "User Accelerometer"
+            Sensor.TYPE_GRAVITY -> "Gravity Sensor"
             Sensor.TYPE_GYROSCOPE -> "Gyroscope"
             Sensor.TYPE_MAGNETIC_FIELD -> "Magnetometer"
             else -> "Undefined"

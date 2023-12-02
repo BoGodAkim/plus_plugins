@@ -83,6 +83,30 @@ void main() {
     expect(isAvailable, true);
   });
 
+  test('gravityEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/gravity';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 3.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setGravitySamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await gravityEventStream().first;
+
+    expect(event.x, sensorData[0]);
+    expect(event.y, sensorData[1]);
+    expect(event.z, sensorData[2]);
+    expect(event.accuracy, Accuracy.high);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isGravityAvailable are working', () async {
+    _initializeFakeMethodChannel('isGravityAvailable', true);
+
+    final isAvailable = await isGravityAvailable;
+
+    expect(isAvailable, true);
+  });
+
   test('magnetometerEvents are streamed', () async {
     const channelName = 'dev.fluttercommunity.plus/sensors/magnetometer';
     final DateTime timestamp = DateTime.now();

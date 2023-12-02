@@ -78,6 +78,22 @@ Future<bool> get isUserAccelerometerAvailable async {
   return await _sensors.isUserAccelerometerAvailable;
 }
 
+/// Returns a broadcast stream of events from the device gravity sensor at the
+/// given sampling frequency.
+@override
+Stream<GravityEvent> gravityEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return _sensors.gravityEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the gravity sensor is
+/// available.
+@override
+Future<bool> get isGravityAvailable async {
+  return await _sensors.isGravityAvailable;
+}
+
 /// Returns a broadcast stream of events from the device magnetometer at the
 /// given sampling frequency.
 @override

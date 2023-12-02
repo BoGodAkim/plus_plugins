@@ -13,11 +13,13 @@ import 'src/accelerometer_event.dart';
 import 'src/gyroscope_event.dart';
 import 'src/magnetometer_event.dart';
 import 'src/user_accelerometer_event.dart';
+import 'src/gravity_event.dart';
 
 export 'src/accelerometer_event.dart';
 export 'src/gyroscope_event.dart';
 export 'src/magnetometer_event.dart';
 export 'src/user_accelerometer_event.dart';
+export 'src/gravity_event.dart';
 export 'src/sensor_interval.dart';
 export 'src/accuracy.dart';
 
@@ -111,6 +113,20 @@ abstract class SensorsPlatform extends PlatformInterface {
   Future<bool> get isUserAccelerometerAvailable {
     throw UnimplementedError(
         'isUserAccelerometerAvailable has not been implemented.');
+  }
+
+  /// Returns a broadcast stream of events from the device gravity sensor at the
+  /// given sampling frequency.
+  Stream<GravityEvent> gravityEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    throw UnimplementedError('gravityEvents has not been implemented.');
+  }
+
+  /// Returns a boolean value indicating whether the gravity sensor is
+  /// available.
+  Future<bool> get isGravityAvailable {
+    throw UnimplementedError('isGravityAvailable has not been implemented.');
   }
 
   /// Returns a broadcast stream of events from the device magnetometer at the

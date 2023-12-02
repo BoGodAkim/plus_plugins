@@ -31,6 +31,16 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
         _eventChannels[userAccelerometerStreamHandlerName] = userAccelerometerChannel
         _streamHandlers[userAccelerometerStreamHandlerName] = userAccelerometerStreamHandler
 
+        let gravityStreamHandler = FPPGravityStreamHandlerPlus()
+        let gravityStreamHandlerName = "dev.fluttercommunity.plus/sensors/gravity"
+        let gravityChannel = FlutterEventChannel(
+                name: gravityStreamHandlerName,
+                binaryMessenger: registrar.messenger()
+        )
+        gravityChannel.setStreamHandler(gravityStreamHandler)
+        _eventChannels[gravityStreamHandlerName] = gravityChannel
+        _streamHandlers[gravityStreamHandlerName] = gravityStreamHandler
+
         let gyroscopeStreamHandler = FPPGyroscopeStreamHandlerPlus()
         let gyroscopeStreamHandlerName = "dev.fluttercommunity.plus/sensors/gyroscope"
         let gyroscopeChannel = FlutterEventChannel(
@@ -64,6 +74,8 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
                     streamHandler = _streamHandlers[accelerometerStreamHandlerName]
                 case "isUserAccelerometerAvailable":
                     streamHandler = _streamHandlers[userAccelerometerStreamHandlerName]
+                case "isGravityAvailable":
+                    streamHandler = _streamHandlers[gravityStreamHandlerName]
                 case "isGyroscopeAvailable":
                     streamHandler = _streamHandlers[gyroscopeStreamHandlerName]
                 case "isMagnetometerAvailable":
@@ -80,6 +92,8 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
                     streamHandler = _streamHandlers[accelerometerStreamHandlerName]
                 case "setUserAccelerometerSamplingPeriod":
                     streamHandler = _streamHandlers[userAccelerometerStreamHandlerName]
+                case "setGravitySamplingPeriod":
+                    streamHandler = _streamHandlers[gravityStreamHandlerName]
                 case "setGyroscopeSamplingPeriod":
                     streamHandler = _streamHandlers[gyroscopeStreamHandlerName]
                 case "setMagnetometerSamplingPeriod":

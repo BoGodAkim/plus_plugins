@@ -20,6 +20,11 @@ Stream<AccelerometerEvent> accelerometerEventStream({
   return methodChannel.accelerometerEventStream(samplingPeriod: samplingPeriod);
 }
 
+ /// Returns a boolean value indicating whether the accelerometer is available.
+Future<bool> get isAccelerometerAvailable {
+  return methodChannel.isAccelerometerAvailable;
+}
+
 /// Returns a broadcast stream of events from the device gyroscope at the
 /// given sampling frequency.
 @override
@@ -27,6 +32,11 @@ Stream<GyroscopeEvent> gyroscopeEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
   return methodChannel.gyroscopeEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the gyroscope is available.
+Future<bool> get isGyroscopeAvailable {
+  return methodChannel.isGyroscopeAvailable;
 }
 
 /// Returns a broadcast stream of events from the device accelerometer with
@@ -39,6 +49,27 @@ Stream<UserAccelerometerEvent> userAccelerometerEventStream({
       samplingPeriod: samplingPeriod);
 }
 
+/// Returns a boolean value indicating whether the user accelerometer is
+/// available.
+Future<bool> get isUserAccelerometerAvailable {
+  return methodChannel.isUserAccelerometerAvailable;
+}
+
+/// Returns a broadcast stream of events from the device gravity sensor at the
+/// given sampling frequency.
+@override
+Stream<GravityEvent> gravityEventStream({
+  Duration samplingPeriod = SensorInterval.normalInterval,
+}) {
+  return methodChannel.gravityEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the gravity sensor is
+/// available.
+Future<bool> get isGravityAvailable {
+  return methodChannel.isGravityAvailable;
+}
+
 /// Returns a broadcast stream of events from the device magnetometer at the
 /// given sampling frequency.
 @override
@@ -46,6 +77,12 @@ Stream<MagnetometerEvent> magnetometerEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
   return methodChannel.magnetometerEventStream(samplingPeriod: samplingPeriod);
+}
+
+/// Returns a boolean value indicating whether the magnetometer is
+/// available.
+Future<bool> get isMagnetometerAvailable {
+  return methodChannel.isMagnetometerAvailable;
 }
 
 void main() {
@@ -70,7 +107,7 @@ void main() {
   test('isAccelerometerAvailable are working', () async {
     _initializeFakeMethodChannel('isAccelerometerAvailable', true);
 
-    final isAvailable = await methodChannel.isAccelerometerAvailable;
+    final isAvailable = await isAccelerometerAvailable;
 
     expect(isAvailable, true);
   });
@@ -94,7 +131,7 @@ void main() {
   test('isGyroscopeAvailable are working', () async {
     _initializeFakeMethodChannel('isGyroscopeAvailable', true);
 
-    final isAvailable = await methodChannel.isGyroscopeAvailable;
+    final isAvailable = await isGyroscopeAvailable;
 
     expect(isAvailable, true);
   });
@@ -118,7 +155,31 @@ void main() {
   test('isUserAccelerometerAvailable are working', () async {
     _initializeFakeMethodChannel('isUserAccelerometerAvailable', true);
 
-    final isAvailable = await methodChannel.isUserAccelerometerAvailable;
+    final isAvailable = await isUserAccelerometerAvailable;
+
+    expect(isAvailable, true);
+  });
+
+  test('gravityEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/gravity';
+    final DateTime timestamp = DateTime.now();
+    final sensorData = <double>[9.0, 10.0, 11.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
+    _initializeFakeMethodChannel('setGravitySamplingPeriod');
+    _initializeFakeSensorChannel(channelName, sensorData);
+
+    final event = await gravityEventStream().first;
+
+    expect(event.x, sensorData[0]);
+    expect(event.y, sensorData[1]);
+    expect(event.z, sensorData[2]);
+    expect(event.accuracy, Accuracy.medium);
+    expect(event.timestamp, timestamp);
+  });
+
+  test('isGravityAvailable are working', () async {
+    _initializeFakeMethodChannel('isGravityAvailable', true);
+
+    final isAvailable = await isGravityAvailable;
 
     expect(isAvailable, true);
   });
@@ -142,7 +203,7 @@ void main() {
   test('isMagnetometerAvailable are working', () async {
     _initializeFakeMethodChannel('isMagnetometerAvailable', true);
 
-    final isAvailable = await methodChannel.isMagnetometerAvailable;
+    final isAvailable = await isMagnetometerAvailable;
 
     expect(isAvailable, true);
   });

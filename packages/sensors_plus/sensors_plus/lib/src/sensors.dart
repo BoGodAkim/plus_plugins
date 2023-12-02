@@ -72,6 +72,26 @@ class Sensors extends SensorsPlatform {
     return await _platform.isUserAccelerometerAvailable;
   }
 
+  /// Returns a broadcast stream of events from the device gravity sensor at the
+  /// given sampling frequency.
+  /// 
+  /// This method always returning the same stream. If this method is called
+  /// again, the sampling period of the stream will be update. All previous
+  /// listener will also be affected.
+  @override
+  Stream<GravityEvent> gravityEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    return _platform.gravityEventStream(samplingPeriod: samplingPeriod);
+  }
+
+  /// Returns a boolean value indicating whether the gravity sensor is
+  /// available.
+  @override
+  Future<bool> get isGravityAvailable async {
+    return await _platform.isGravityAvailable;
+  }
+
   /// Returns a broadcast stream of events from the device magnetometer at the
   /// given sampling frequency.
   ///

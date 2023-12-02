@@ -18,6 +18,9 @@ class MethodChannelSensors extends SensorsPlatform {
   static const EventChannel _userAccelerometerEventChannel =
       EventChannel('dev.fluttercommunity.plus/sensors/user_accel');
 
+  static const EventChannel _gravityEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/gravity');
+
   static const EventChannel _gyroscopeEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/gyroscope');
 
   static const EventChannel _magnetometerEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/magnetometer');
@@ -27,6 +30,7 @@ class MethodChannelSensors extends SensorsPlatform {
   Stream<GyroscopeEvent>? _gyroscopeEvents;
   Stream<UserAccelerometerEvent>? _userAccelerometerEvents;
   Stream<MagnetometerEvent>? _magnetometerEvents;
+  Stream<GravityEvent>? _gravityEvents;
 
   /// Returns a broadcast stream of events from the device accelerometer at the
   /// given sampling frequency.
@@ -162,6 +166,52 @@ class MethodChannelSensors extends SensorsPlatform {
   @override
   Future<bool> get isUserAccelerometerAvailable async {
     return await _methodChannel.invokeMethod('isUserAccelerometerAvailable');
+  }
+
+  /// Returns a broadcast stream of events from the device gravity sensor at the
+  /// given sampling frequency.
+  @override
+  Stream<GravityEvent> gravityEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) {
+    var microseconds = samplingPeriod.inMicroseconds;
+    if (microseconds >= 1 && microseconds <= 3) {
+      logger.warning('The SamplingPeriod is currently set to $microsecondsμs, '
+          'which is a reserved value in Android. Please consider changing it '
+          'to either 0 or 4μs. See https://developer.android.com/reference/'
+          'android/hardware/SensorManager#registerListener(android.hardware.'
+          'SensorEventListener,%20android.hardware.Sensor,%20int) for more '
+          'information');
+      microseconds = 0;
+    }
+    _methodChannel.invokeMethod('setGravitySamplingPeriod', microseconds);
+    _gravityEvents ??= _gravityEventChannel.receiveBroadcastStream().map((dynamic event) {
+      final List<num> list = event.cast<num>();
+      Accuracy accuracy = Accuracy.unknown;
+      switch (list[3].toInt()) {
+        case 0:
+          accuracy = Accuracy.uncalibrated;
+          break;
+        case 1:
+          accuracy = Accuracy.low;
+          break;
+        case 2:
+          accuracy = Accuracy.medium;
+          break;
+        case 3:
+          accuracy = Accuracy.high;
+          break;
+      }
+      return GravityEvent(list[0].toDouble(), list[1].toDouble(), list[2].toDouble(), DateTime.fromMicrosecondsSinceEpoch(list[4].toInt()), accuracy);
+    });
+    return _gravityEvents!;
+  }
+
+  /// Returns a boolean value indicating whether the gravity sensor is
+  /// available.
+  @override
+  Future<bool> get isGravityAvailable async {
+    return await _methodChannel.invokeMethod('isGravityAvailable');
   }
 
   /// Returns a broadcast stream of events from the device magnetometer at the
