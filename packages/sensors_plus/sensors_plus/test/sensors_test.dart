@@ -180,14 +180,14 @@ void main() {
     expect(isAvailable, true);
   });
 
-  test('absoluteRotationQuaternionEvents are streamed', () async {
-    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion';
+  test('absoluteOrientationQuaternionEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/absolute_orientation_quaternion';
     final DateTime timestamp = DateTime.now();
     final sensorData = <double>[9.0, 10.0, 11.0, 12.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
-    _initializeFakeMethodChannel('setAbsoluteRotationQuaternionSamplingPeriod');
+    _initializeFakeMethodChannel('setAbsoluteOrientationQuaternionSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await absoluteRotationQuaternionEventStream().first;
+    final event = await absoluteOrientationQuaternionEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -197,22 +197,22 @@ void main() {
     expect(event.timestamp, timestamp);
   });
 
-  test('isAbsoluteRotationQuaternionAvailable are working', () async {
-    _initializeFakeMethodChannel('isAbsoluteRotationQuaternionAvailable', true);
+  test('isAbsoluteOrientationQuaternionAvailable are working', () async {
+    _initializeFakeMethodChannel('isAbsoluteOrientationQuaternionAvailable', true);
 
-    final isAvailable = await isAbsoluteRotationQuaternionSensorAvailable;
+    final isAvailable = await isAbsoluteOrientationQuaternionSensorAvailable;
 
     expect(isAvailable, true);
   });
 
-  test('rotationQuaternionEvents are streamed', () async {
-    const channelName = 'dev.fluttercommunity.plus/sensors/rotation_quaternion';
+  test('orientationQuaternionEvents are streamed', () async {
+    const channelName = 'dev.fluttercommunity.plus/sensors/orientation_quaternion';
     final DateTime timestamp = DateTime.now();
     final sensorData = <double>[9.0, 10.0, 11.0, 12.0, 2.0, timestamp.microsecondsSinceEpoch.toDouble()];
-    _initializeFakeMethodChannel('setRotationQuaternionSamplingPeriod');
+    _initializeFakeMethodChannel('setOrientationQuaternionSamplingPeriod');
     _initializeFakeSensorChannel(channelName, sensorData);
 
-    final event = await rotationQuaternionEventStream().first;
+    final event = await orientationQuaternionEventStream().first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
@@ -222,10 +222,10 @@ void main() {
     expect(event.timestamp, timestamp);
   });
 
-  test('isRotationQuaternionAvailable are working', () async {
-    _initializeFakeMethodChannel('isRotationQuaternionAvailable', true);
+  test('isOrientationQuaternionAvailable are working', () async {
+    _initializeFakeMethodChannel('isOrientationQuaternionAvailable', true);
 
-    final isAvailable = await isRotationQuaternionSensorAvailable;
+    final isAvailable = await isOrientationQuaternionSensorAvailable;
 
     expect(isAvailable, true);
   });
@@ -251,7 +251,7 @@ void main() {
 
     final event = await absoluteRotationMatrixEventStream().first;
 
-    expect(event.rotationMatrix, Matrix3.fromList(sensorData.sublist(0, 9)));
+    expect(event.matrix, Matrix3.fromList(sensorData.sublist(0, 9)));
     expect(event.accuracy, Accuracy.low);
     expect(event.timestamp, timestamp);
   });
@@ -285,7 +285,7 @@ void main() {
 
     final event = await rotationMatrixEventStream().first;
 
-    expect(event.rotationMatrix, Matrix3.fromList(sensorData.sublist(0, 9)));
+    expect(event.matrix, Matrix3.fromList(sensorData.sublist(0, 9)));
     expect(event.accuracy, Accuracy.low);
     expect(event.timestamp, timestamp);
   });

@@ -51,7 +51,7 @@ class FPPSensorsPlusStreamHandler: NSObject, MotionStreamHandler {
         fatalError("setUpdateInterval() is not implemented")
     }
 
-    func sendData(data: Array<Float64>, sink: @escaping FlutterEventSink) {
+    func sendData(data: Array<Float64>, sink: @escaping FlutterEventSink, accuracy: CMMagneticFieldCalibrationAccuracy? = nil) {
         if _isCleanUp {
             return
         }
@@ -59,8 +59,21 @@ class FPPSensorsPlusStreamHandler: NSObject, MotionStreamHandler {
         // and fired until fully detached.
 
         var duplicatedData = data
-        // IOS doesn't have accuracy data, so we send -1 (unknown) instead.
-        duplicatedData += [Float64(-1)]
+        var accuracyValue = Float64(-1)
+        switch accuracy {
+        case .uncalibrated:
+            accuracyValue = Float64(0)
+        case .low:
+            accuracyValue = Float64(1)
+        case .medium:
+            accuracyValue = Float64(2)
+        case .high:
+            accuracyValue = Float64(3)
+        default:
+            accuracyValue = Float64(-1)
+        }
+
+        duplicatedData += [accuracyValue]
         duplicatedData += [Float64((Date().timeIntervalSince1970 * 1000000).rounded())]
 
         DispatchQueue.main.async {
@@ -70,9 +83,6 @@ class FPPSensorsPlusStreamHandler: NSObject, MotionStreamHandler {
         }
     }
 }
-
-
-
 
 class FPPAccelerometerStreamHandlerPlus: FPPSensorsPlusStreamHandler {
 
@@ -266,18 +276,19 @@ class FPPMagnetometerStreamHandlerPlus: FPPSensorsPlusStreamHandler {
     }
 
     override func  setUpdateInterval(_ interval: Double) {
-        motionManager.magnetometerUpdateInterval = interval
+        motionManager.deviceMotionUpdateInterval = interval
     }
 
     override func isAvailable() -> Bool {
-        return CMMotionManager().isMagnetometerAvailable
+        return CMMotionManager().isDeviceMotionAvailable
     }
 
     override func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        motionManager.startMagnetometerUpdates(to: OperationQueue()) { data, error in
+        motionManager.showsDeviceMovementDisplay = true
+        motionManager.startDeviceMotionUpdates(to: OperationQueue()) { data, error in
             if (error != nil) {
                 sink(FlutterError(
                         code: "UNAVAILABLE",
@@ -287,7 +298,7 @@ class FPPMagnetometerStreamHandlerPlus: FPPSensorsPlusStreamHandler {
                 return
             }
             let magneticField = data!.magneticField
-            self.sendData(data: [magneticField.x, magneticField.y, magneticField.z ], sink: sink)
+            self.sendData(data: [magneticField.field.x, magneticField.field.y, magneticField.field.z], sink: sink, accuracy: magneticField.accuracy)
         }
         return nil
     }
@@ -354,7 +365,7 @@ class FPPOrientationStreamHandlerPlus: FPPSensorsPlusStreamHandler {
     }
 }
 
-class FPPRotationQuaternionStreamHandlerPlus: FPPSensorsPlusStreamHandler {
+class FPPOrientationQuaternionStreamHandlerPlus: FPPSensorsPlusStreamHandler {
     private var attitudeReferenceFrame: CMAttitudeReferenceFrame
 
     init(_ referenceFrame: CMAttitudeReferenceFrame) {

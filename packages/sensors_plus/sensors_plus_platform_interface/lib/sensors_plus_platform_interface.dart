@@ -16,8 +16,8 @@ import 'src/user_accelerometer_event.dart';
 import 'src/gravity_event.dart';
 import 'src/absolute_orientation_event.dart';
 import 'src/orientation_event.dart';
-import 'src/absolute_rotation_quaternion_event.dart';
-import 'src/rotation_quaternion_event.dart';
+import 'src/absolute_orientation_quaternion_event.dart';
+import 'src/orientation_quaternion_event.dart';
 import 'src/absolute_rotation_matrix_event.dart';
 import 'src/rotation_matrix_event.dart';
 
@@ -28,8 +28,8 @@ export 'src/user_accelerometer_event.dart';
 export 'src/gravity_event.dart';
 export 'src/absolute_orientation_event.dart';
 export 'src/orientation_event.dart';
-export 'src/absolute_rotation_quaternion_event.dart';
-export 'src/rotation_quaternion_event.dart';
+export 'src/absolute_orientation_quaternion_event.dart';
+export 'src/orientation_quaternion_event.dart';
 export 'src/absolute_rotation_matrix_event.dart';
 export 'src/rotation_matrix_event.dart';
 export 'src/sensor_interval.dart';
@@ -181,30 +181,30 @@ abstract class SensorsPlatform extends PlatformInterface {
 
   /// Returns a broadcast stream of events from the device absolute rotation
   /// quaternion sensor at the given sampling frequency.
-  Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+  Stream<AbsoluteOrientationQuaternionEvent> absoluteOrientationQuaternionEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    throw UnimplementedError('absoluteRotationQuaternionEvents has not been implemented.');
+    throw UnimplementedError('absoluteOrientationQuaternionEvents has not been implemented.');
   }
 
   /// Returns a boolean value indicating whether the absolute rotation
   /// quaternion sensor is available.
-  Future<bool> get isAbsoluteRotationQuaternionSensorAvailable {
-    throw UnimplementedError('isAbsoluteRotationQuaternionSensorAvailable has not been implemented.');
+  Future<bool> get isAbsoluteOrientationQuaternionSensorAvailable {
+    throw UnimplementedError('isAbsoluteOrientationQuaternionSensorAvailable has not been implemented.');
   }
 
   /// Returns a broadcast stream of events from the device rotation quaternion
   /// sensor at the given sampling frequency.
-  Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+  Stream<OrientationQuaternionEvent> orientationQuaternionEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    throw UnimplementedError('rotationQuaternionEvents has not been implemented.');
+    throw UnimplementedError('orientationQuaternionEvents has not been implemented.');
   }
 
   /// Returns a boolean value indicating whether the rotation quaternion sensor
   /// is available.
-  Future<bool> get isRotationQuaternionSensorAvailable {
-    throw UnimplementedError('isRotationQuaternionSensorAvailable has not been implemented.');
+  Future<bool> get isOrientationQuaternionSensorAvailable {
+    throw UnimplementedError('isOrientationQuaternionSensorAvailable has not been implemented.');
   }
 
   /// Returns a broadcast stream of events from the device absolute rotation

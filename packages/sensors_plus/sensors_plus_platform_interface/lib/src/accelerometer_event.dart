@@ -4,6 +4,31 @@
 
 import 'package:vector_math/vector_math_64.dart';
 
+/// TODO: Rework example app 
+/// TODO: Check OrientationStreamHandler for Android
+/// TODO: Add documentation for new event classes
+
+///                                 Android      iOS
+///  gravity                        yes          yes       done
+///  rotation vector                dep          yes       in progress
+///  game rotation vector           yes          yes(?)    in progress
+///  geomagnetic rotation vector    yes          ?
+///  rotation matrix                yes          yes       in progress
+///  rotation quaternion            yes          yes       in progress
+///  screen orientation             yes          yes
+///  ambient temperature            yes          no
+///  light                          yes          yes
+///  pressure                       yes          yes
+///  relative humidity              yes          no
+///  proximity                      yes          yes
+
+/// TODO: Compare sensors work on Android and iOS
+/// TODO: Add environment sensors
+/// TODO: Add to the documentation difference in accuracy between Android and iOS
+/// TODO: Look into web implementation
+
+
+
 import 'accuracy.dart';
 
 /// Discrete reading from an accelerometer. Accelerometers measure the velocity

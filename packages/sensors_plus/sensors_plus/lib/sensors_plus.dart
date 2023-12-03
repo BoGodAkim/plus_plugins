@@ -129,30 +129,30 @@ Future<bool> get isOrientationSensorAvailable {
 
 /// Returns a broadcast stream of events from the device absolute rotation
 /// quaternion sensor at the given sampling frequency.
-Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+Stream<AbsoluteOrientationQuaternionEvent> absoluteOrientationQuaternionEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
-  return _sensors.absoluteRotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+  return _sensors.absoluteOrientationQuaternionEventStream(samplingPeriod: samplingPeriod);
 }
 
 /// Returns a boolean value indicating whether the absolute rotation
 /// quaternion sensor is available.
-Future<bool> get isAbsoluteRotationQuaternionSensorAvailable {
-  return _sensors.isAbsoluteRotationQuaternionSensorAvailable;
+Future<bool> get isAbsoluteOrientationQuaternionSensorAvailable {
+  return _sensors.isAbsoluteOrientationQuaternionSensorAvailable;
 }
 
 /// Returns a broadcast stream of events from the device rotation quaternion
 /// sensor at the given sampling frequency.
-Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+Stream<OrientationQuaternionEvent> orientationQuaternionEventStream({
   Duration samplingPeriod = SensorInterval.normalInterval,
 }) {
-  return _sensors.rotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+  return _sensors.orientationQuaternionEventStream(samplingPeriod: samplingPeriod);
 }
 
 /// Returns a boolean value indicating whether the rotation quaternion sensor
 /// is available.
-Future<bool> get isRotationQuaternionSensorAvailable {
-  return _sensors.isRotationQuaternionSensorAvailable;
+Future<bool> get isOrientationQuaternionSensorAvailable {
+  return _sensors.isOrientationQuaternionSensorAvailable;
 }
 
 /// Returns a broadcast stream of events from the device absolute rotation

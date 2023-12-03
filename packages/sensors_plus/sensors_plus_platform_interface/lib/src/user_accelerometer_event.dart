@@ -5,6 +5,7 @@
 import 'package:vector_math/vector_math_64.dart';
 
 import 'accuracy.dart';
+import 'accelerometer_event.dart';
 
 /// Like [AccelerometerEvent], this is a discrete reading from an accelerometer
 /// and measures the velocity of the device. However, unlike

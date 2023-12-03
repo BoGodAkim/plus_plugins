@@ -128,7 +128,7 @@ internal class OrientationStreamHandlerImpl(
     }
 }
 
-internal class RotationQuaternionStreamHandlerImpl(
+internal class OrientationQuaternionStreamHandlerImpl(
     sensorManager: SensorManager,
     sensorType: Int
 ) : StreamHandlerImpl(sensorManager, sensorType) {

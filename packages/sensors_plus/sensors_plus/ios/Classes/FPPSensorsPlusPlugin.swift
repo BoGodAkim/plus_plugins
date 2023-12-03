@@ -82,25 +82,25 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
         _eventChannels[absoluteOrientationStreamHandlerName] = absoluteOrientationChannel
         _streamHandlers[absoluteOrientationStreamHandlerName] = absoluteOrientationStreamHandler
 
-        let rotationQuaternionStreamHandler = FPPRotationQuaternionStreamHandlerPlus(CMAttitudeReferenceFrame.xArbitraryZVertical)
-        let rotationQuaternionStreamHandlerName = "dev.fluttercommunity.plus/sensors/rotation_quaternion"
-        let rotationQuaternionChannel = FlutterEventChannel(
-                name: rotationQuaternionStreamHandlerName,
+        let orientationQuaternionStreamHandler = FPPOrientationQuaternionStreamHandlerPlus(CMAttitudeReferenceFrame.xArbitraryZVertical)
+        let orientationQuaternionStreamHandlerName = "dev.fluttercommunity.plus/sensors/orientation_quaternion"
+        let orientationQuaternionChannel = FlutterEventChannel(
+                name: orientationQuaternionStreamHandlerName,
                 binaryMessenger: registrar.messenger()
         )
-        rotationQuaternionChannel.setStreamHandler(rotationQuaternionStreamHandler)
-        _eventChannels[rotationQuaternionStreamHandlerName] = rotationQuaternionChannel
-        _streamHandlers[rotationQuaternionStreamHandlerName] = rotationQuaternionStreamHandler
+        orientationQuaternionChannel.setStreamHandler(orientationQuaternionStreamHandler)
+        _eventChannels[orientationQuaternionStreamHandlerName] = orientationQuaternionChannel
+        _streamHandlers[orientationQuaternionStreamHandlerName] = orientationQuaternionStreamHandler
 
-        let absoluteRotationQuaternionStreamHandler = FPPRotationQuaternionStreamHandlerPlus(CMAttitudeReferenceFrame.xMagneticNorthZVertical)
-        let absoluteRotationQuaternionStreamHandlerName = "dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion"
-        let absoluteRotationQuaternionChannel = FlutterEventChannel(
-                name: absoluteRotationQuaternionStreamHandlerName,
+        let absoluteOrientationQuaternionStreamHandler = FPPOrientationQuaternionStreamHandlerPlus(CMAttitudeReferenceFrame.xMagneticNorthZVertical)
+        let absoluteOrientationQuaternionStreamHandlerName = "dev.fluttercommunity.plus/sensors/absolute_orientation_quaternion"
+        let absoluteOrientationQuaternionChannel = FlutterEventChannel(
+                name: absoluteOrientationQuaternionStreamHandlerName,
                 binaryMessenger: registrar.messenger()
         )
-        absoluteRotationQuaternionChannel.setStreamHandler(absoluteRotationQuaternionStreamHandler)
-        _eventChannels[absoluteRotationQuaternionStreamHandlerName] = absoluteRotationQuaternionChannel
-        _streamHandlers[absoluteRotationQuaternionStreamHandlerName] = absoluteRotationQuaternionStreamHandler
+        absoluteOrientationQuaternionChannel.setStreamHandler(absoluteOrientationQuaternionStreamHandler)
+        _eventChannels[absoluteOrientationQuaternionStreamHandlerName] = absoluteOrientationQuaternionChannel
+        _streamHandlers[absoluteOrientationQuaternionStreamHandlerName] = absoluteOrientationQuaternionStreamHandler
 
         let rotationMatrixStreamHandler = FPPRotationMatrixStreamHandlerPlus(CMAttitudeReferenceFrame.xArbitraryZVertical)
         let rotationMatrixStreamHandlerName = "dev.fluttercommunity.plus/sensors/rotation_matrix"
@@ -145,10 +145,10 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
                     streamHandler = _streamHandlers[orientationStreamHandlerName]
                 case "isAbsoluteOrientationAvailable":
                     streamHandler = _streamHandlers[absoluteOrientationStreamHandlerName]
-                case "isRotationQuaternionAvailable":
-                    streamHandler = _streamHandlers[rotationQuaternionStreamHandlerName]
-                case "isAbsoluteRotationQuaternionAvailable":
-                    streamHandler = _streamHandlers[absoluteRotationQuaternionStreamHandlerName]
+                case "isOrientationQuaternionAvailable":
+                    streamHandler = _streamHandlers[orientationQuaternionStreamHandlerName]
+                case "isAbsoluteOrientationQuaternionAvailable":
+                    streamHandler = _streamHandlers[absoluteOrientationQuaternionStreamHandlerName]
                 case "isRotationMatrixAvailable":
                     streamHandler = _streamHandlers[rotationMatrixStreamHandlerName]
                 case "isAbsoluteRotationMatrixAvailable":
@@ -175,10 +175,10 @@ public class FPPSensorsPlusPlugin: NSObject, FlutterPlugin {
                     streamHandler = _streamHandlers[orientationStreamHandlerName]
                 case "setAbsoluteOrientationSamplingPeriod":
                     streamHandler = _streamHandlers[absoluteOrientationStreamHandlerName]
-                case "setRotationQuaternionSamplingPeriod":
-                    streamHandler = _streamHandlers[rotationQuaternionStreamHandlerName]
-                case "setAbsoluteRotationQuaternionSamplingPeriod":
-                    streamHandler = _streamHandlers[absoluteRotationQuaternionStreamHandlerName]
+                case "setOrientationQuaternionSamplingPeriod":
+                    streamHandler = _streamHandlers[orientationQuaternionStreamHandlerName]
+                case "setAbsoluteOrientationQuaternionSamplingPeriod":
+                    streamHandler = _streamHandlers[absoluteOrientationQuaternionStreamHandlerName]
                 case "setRotationMatrixSamplingPeriod":
                     streamHandler = _streamHandlers[rotationMatrixStreamHandlerName]
                 case "setAbsoluteRotationMatrixSamplingPeriod":

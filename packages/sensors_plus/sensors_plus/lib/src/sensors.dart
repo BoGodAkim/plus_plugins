@@ -157,17 +157,17 @@ class Sensors extends SensorsPlatform {
   /// again, the sampling period of the stream will be update. All previous
   /// listener will also be affected.
   @override
-  Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+  Stream<OrientationQuaternionEvent> orientationQuaternionEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    return _platform.rotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+    return _platform.orientationQuaternionEventStream(samplingPeriod: samplingPeriod);
   }
 
   /// Returns a boolean value indicating whether the rotation quaternion sensor
   /// is available.
   @override
-  Future<bool> get isRotationQuaternionSensorAvailable async {
-    return await _platform.isRotationQuaternionSensorAvailable;
+  Future<bool> get isOrientationQuaternionSensorAvailable async {
+    return await _platform.isOrientationQuaternionSensorAvailable;
   }
 
   /// Returns a broadcast stream of events from the device absolute rotation
@@ -177,17 +177,17 @@ class Sensors extends SensorsPlatform {
   /// again, the sampling period of the stream will be update. All previous
   /// listener will also be affected.
   @override
-  Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+  Stream<AbsoluteOrientationQuaternionEvent> absoluteOrientationQuaternionEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    return _platform.absoluteRotationQuaternionEventStream(samplingPeriod: samplingPeriod);
+    return _platform.absoluteOrientationQuaternionEventStream(samplingPeriod: samplingPeriod);
   }
 
   /// Returns a boolean value indicating whether the absolute rotation
   /// quaternion sensor is available.
   @override
-  Future<bool> get isAbsoluteRotationQuaternionSensorAvailable async {
-    return await _platform.isAbsoluteRotationQuaternionSensorAvailable;
+  Future<bool> get isAbsoluteOrientationQuaternionSensorAvailable async {
+    return await _platform.isAbsoluteOrientationQuaternionSensorAvailable;
   }
 
   /// Returns a broadcast stream of events from the device game rotation

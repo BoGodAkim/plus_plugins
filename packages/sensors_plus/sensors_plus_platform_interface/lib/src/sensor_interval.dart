@@ -1,5 +1,9 @@
 import 'package:meta/meta.dart';
 
+/// Interval between sensor events.
+/// It is not guaranteed that the events will be received with the given interval.
+/// Usually the interval is equal or shorter than the given interval,
+/// but it can be longer due if the sensor captures data with a slower frequency.
 @sealed
 class SensorInterval {
   static const normalInterval = Duration(milliseconds: 200);

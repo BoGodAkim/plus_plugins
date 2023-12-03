@@ -2,6 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'magnetometer_event.dart';
+
+/// Accuracy of a sensor
+/// On iOS, the accuracy of a sensor is undefined and therefore this
+/// it will always return [Accuracy.unknown], except for the
+/// [MagnetometerEvent].
 enum Accuracy {
   /// Lower accuracy
   /// 

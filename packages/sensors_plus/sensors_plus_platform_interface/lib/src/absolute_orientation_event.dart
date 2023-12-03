@@ -6,6 +6,10 @@ import 'package:vector_math/vector_math_64.dart';
 
 import 'accuracy.dart';
 
+/// This is composite sensor which uses the accelerometer, gyroscope, and
+/// magnetometer to compute the device's absolute orientation.
+/// [AbsoluteOrientationEvent] is more accurate than [OrientationEvent], but
+/// less energy efficient.
 /// TODO: Add documentation
 class AbsoluteOrientationEvent {
   /// Constructs an instance with the given [pitch], [roll], and [yaw] values.

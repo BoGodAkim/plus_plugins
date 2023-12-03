@@ -63,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
   MagnetometerEvent? _magnetometerEvent;
   AbsoluteOrientationEvent? _absoluteOrientationEvent;
   OrientationEvent? _orientationEvent;
-  AbsoluteRotationQuaternionEvent? _absoluteRotationQuaternionEvent;
-  RotationQuaternionEvent? _rotationQuaternionEvent;
+  AbsoluteOrientationQuaternionEvent? _absoluteOrientationQuaternionEvent;
+  OrientationQuaternionEvent? _orientationQuaternionEvent;
   AbsoluteRotationMatrixEvent? _absoluteRotationMatrixEvent;
   RotationMatrixEvent? _rotationMatrixEvent;
 
@@ -75,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _magnetometerAvailable = false;
   bool _absoluteOrientationSensorAvailable = false;
   bool _orientationSensorAvailable = false;
-  bool _absoluteRotationQuaternionSensorAvailable = false;
-  bool _rotationQuaternionSensorAvailable = false;
+  bool _absoluteOrientationQuaternionSensorAvailable = false;
+  bool _orientationQuaternionSensorAvailable = false;
   bool _absoluteRotationMatrixSensorAvailable = false;
   bool _rotationMatrixSensorAvailable = false;
 
@@ -87,8 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int? _magnetometerLastInterval;
   int? _absoluteOrientationLastInterval;
   int? _orientationLastInterval;
-  int? _absoluteRotationQuaternionLastInterval;
-  int? _rotationQuaternionLastInterval;
+  int? _absoluteOrientationQuaternionLastInterval;
+  int? _orientationQuaternionLastInterval;
   int? _absoluteRotationMatrixLastInterval;
   int? _rotationMatrixLastInterval;
 
@@ -263,28 +263,28 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text('AbsoluteRotationQuaternion'),
+                            child: Text('AbsoluteOrientationQuaternion'),
                           ),
-                          Text(_absoluteRotationQuaternionSensorAvailable ? '✅' : '❌'),
-                          Text(accuracyToString(_absoluteRotationQuaternionEvent?.accuracy)),
+                          Text(_absoluteOrientationQuaternionSensorAvailable ? '✅' : '❌'),
+                          Text(accuracyToString(_absoluteOrientationQuaternionEvent?.accuracy)),
                           const Text(" "),
                           const Text(" "),
                           const Text(" "),
-                          Text('${_absoluteRotationQuaternionLastInterval?.toString() ?? '?'} ms'),
+                          Text('${_absoluteOrientationQuaternionLastInterval?.toString() ?? '?'} ms'),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text('RotationQuaternion'),
+                            child: Text('OrientationQuaternion'),
                           ),
-                          Text(_rotationQuaternionSensorAvailable ? '✅' : '❌'),
-                          Text(accuracyToString(_rotationQuaternionEvent?.accuracy)),
+                          Text(_orientationQuaternionSensorAvailable ? '✅' : '❌'),
+                          Text(accuracyToString(_orientationQuaternionEvent?.accuracy)),
                           const Text(" "),
                           const Text(" "),
                           const Text(" "),
-                          Text('${_rotationQuaternionLastInterval?.toString() ?? '?'} ms'),
+                          Text('${_orientationQuaternionLastInterval?.toString() ?? '?'} ms'),
                         ],
                       ),
                       TableRow(
@@ -363,8 +363,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     magnetometerEventStream(samplingPeriod: sensorInterval);
                     absoluteOrientationEventStream(samplingPeriod: sensorInterval);
                     orientationEventStream(samplingPeriod: sensorInterval);
-                    absoluteRotationQuaternionEventStream(samplingPeriod: sensorInterval);
-                    rotationQuaternionEventStream(samplingPeriod: sensorInterval);
+                    absoluteOrientationQuaternionEventStream(samplingPeriod: sensorInterval);
+                    orientationQuaternionEventStream(samplingPeriod: sensorInterval);
                     absoluteRotationMatrixEventStream(samplingPeriod: sensorInterval);
                     rotationMatrixEventStream(samplingPeriod: sensorInterval);
                   });
@@ -410,11 +410,11 @@ class _MyHomePageState extends State<MyHomePage> {
     isOrientationSensorAvailable.then((value) => setState(() {
           _orientationSensorAvailable = value;
         }));
-    isAbsoluteRotationQuaternionSensorAvailable.then((value) => setState(() {
-          _absoluteRotationQuaternionSensorAvailable = value;
+    isAbsoluteOrientationQuaternionSensorAvailable.then((value) => setState(() {
+          _absoluteOrientationQuaternionSensorAvailable = value;
         }));
-    isRotationQuaternionSensorAvailable.then((value) => setState(() {
-          _rotationQuaternionSensorAvailable = value;
+    isOrientationQuaternionSensorAvailable.then((value) => setState(() {
+          _orientationQuaternionSensorAvailable = value;
         }));
     isAbsoluteRotationMatrixSensorAvailable.then((value) => setState(() {
           _absoluteRotationMatrixSensorAvailable = value;
@@ -606,16 +606,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
     _streamSubscriptions.add(
-      absoluteRotationQuaternionEventStream(samplingPeriod: sensorInterval).listen(
-        (AbsoluteRotationQuaternionEvent event) {
+      absoluteOrientationQuaternionEventStream(samplingPeriod: sensorInterval).listen(
+        (AbsoluteOrientationQuaternionEvent event) {
           setState(() {
-            if (_absoluteRotationQuaternionEvent != null) {
-              final interval = event.timestamp.difference(_absoluteRotationQuaternionEvent!.timestamp);
+            if (_absoluteOrientationQuaternionEvent != null) {
+              final interval = event.timestamp.difference(_absoluteOrientationQuaternionEvent!.timestamp);
               if (interval > _ignoreDuration) {
-                _absoluteRotationQuaternionLastInterval = interval.inMilliseconds;
+                _absoluteOrientationQuaternionLastInterval = interval.inMilliseconds;
               }
             }
-            _absoluteRotationQuaternionEvent = event;
+            _absoluteOrientationQuaternionEvent = event;
           });
         },
         onError: (e) {
@@ -633,16 +633,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
     _streamSubscriptions.add(
-      rotationQuaternionEventStream(samplingPeriod: sensorInterval).listen(
-        (RotationQuaternionEvent event) {
+      orientationQuaternionEventStream(samplingPeriod: sensorInterval).listen(
+        (OrientationQuaternionEvent event) {
           setState(() {
-            if (_rotationQuaternionEvent != null) {
-              final interval = event.timestamp.difference(_rotationQuaternionEvent!.timestamp);
+            if (_orientationQuaternionEvent != null) {
+              final interval = event.timestamp.difference(_orientationQuaternionEvent!.timestamp);
               if (interval > _ignoreDuration) {
-                _rotationQuaternionLastInterval = interval.inMilliseconds;
+                _orientationQuaternionLastInterval = interval.inMilliseconds;
               }
             }
-            _rotationQuaternionEvent = event;
+            _orientationQuaternionEvent = event;
           });
         },
         onError: (e) {

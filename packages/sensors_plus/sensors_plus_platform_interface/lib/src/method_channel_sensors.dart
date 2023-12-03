@@ -29,11 +29,11 @@ class MethodChannelSensors extends SensorsPlatform {
 
   static const EventChannel _orientationEventChannel = EventChannel('dev.fluttercommunity.plus/sensors/orientation');
 
-  static const EventChannel _absoluteRotationQuaternionEventChannel =
-      EventChannel('dev.fluttercommunity.plus/sensors/absolute_rotation_quaternion');
+  static const EventChannel _absoluteOrientationQuaternionEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/absolute_orientation_quaternion');
 
-  static const EventChannel _rotationQuaternionEventChannel =
-      EventChannel('dev.fluttercommunity.plus/sensors/rotation_quaternion');
+  static const EventChannel _orientationQuaternionEventChannel =
+      EventChannel('dev.fluttercommunity.plus/sensors/orientation_quaternion');
 
   static const EventChannel _absoluteRotationMatrixEventChannel =
       EventChannel('dev.fluttercommunity.plus/sensors/absolute_rotation_matrix');
@@ -49,8 +49,8 @@ class MethodChannelSensors extends SensorsPlatform {
   Stream<GravityEvent>? _gravityEvents;
   Stream<AbsoluteOrientationEvent>? _absoluteOrientationEvents;
   Stream<OrientationEvent>? _orientationEvents;
-  Stream<AbsoluteRotationQuaternionEvent>? _absoluteRotationQuaternionEvents;
-  Stream<RotationQuaternionEvent>? _rotationQuaternionEvents;
+  Stream<AbsoluteOrientationQuaternionEvent>? _absoluteOrientationQuaternionEvents;
+  Stream<OrientationQuaternionEvent>? _orientationQuaternionEvents;
   Stream<AbsoluteRotationMatrixEvent>? _absoluteRotationMatrixEvents;
   Stream<RotationMatrixEvent>? _rotationMatrixEvents;
 
@@ -393,12 +393,12 @@ class MethodChannelSensors extends SensorsPlatform {
   /// Returns a broadcast stream of events from the device absolute rotation
   /// quaternion sensor at the given sampling frequency.
   @override
-  Stream<AbsoluteRotationQuaternionEvent> absoluteRotationQuaternionEventStream({
+  Stream<AbsoluteOrientationQuaternionEvent> absoluteOrientationQuaternionEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    _methodChannel.invokeMethod('setAbsoluteRotationQuaternionSamplingPeriod', samplingPeriod.inMicroseconds);
-    _absoluteRotationQuaternionEvents ??=
-        _absoluteRotationQuaternionEventChannel.receiveBroadcastStream().map((dynamic event) {
+    _methodChannel.invokeMethod('setAbsoluteOrientationQuaternionSamplingPeriod', samplingPeriod.inMicroseconds);
+    _absoluteOrientationQuaternionEvents ??=
+        _absoluteOrientationQuaternionEventChannel.receiveBroadcastStream().map((dynamic event) {
       final List<num> list = event.cast<num>();
       Accuracy accuracy = Accuracy.unknown;
       switch (list[4].toInt()) {
@@ -415,7 +415,7 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return AbsoluteRotationQuaternionEvent(
+      return AbsoluteOrientationQuaternionEvent(
         list[0].toDouble(),
         list[1].toDouble(),
         list[2].toDouble(),
@@ -424,24 +424,24 @@ class MethodChannelSensors extends SensorsPlatform {
         accuracy,
       );
     });
-    return _absoluteRotationQuaternionEvents!;
+    return _absoluteOrientationQuaternionEvents!;
   }
 
   /// Returns a boolean value indicating whether the absolute rotation
   /// quaternion sensor is available.
   @override
-  Future<bool> get isAbsoluteRotationQuaternionSensorAvailable async {
-    return await _methodChannel.invokeMethod('isAbsoluteRotationQuaternionAvailable');
+  Future<bool> get isAbsoluteOrientationQuaternionSensorAvailable async {
+    return await _methodChannel.invokeMethod('isAbsoluteOrientationQuaternionAvailable');
   }
 
   /// Returns a broadcast stream of events from the device rotation quaternion
   /// sensor at the given sampling frequency.
   @override
-  Stream<RotationQuaternionEvent> rotationQuaternionEventStream({
+  Stream<OrientationQuaternionEvent> orientationQuaternionEventStream({
     Duration samplingPeriod = SensorInterval.normalInterval,
   }) {
-    _methodChannel.invokeMethod('setRotationQuaternionSamplingPeriod', samplingPeriod.inMicroseconds);
-    _rotationQuaternionEvents ??= _rotationQuaternionEventChannel.receiveBroadcastStream().map((dynamic event) {
+    _methodChannel.invokeMethod('setOrientationQuaternionSamplingPeriod', samplingPeriod.inMicroseconds);
+    _orientationQuaternionEvents ??= _orientationQuaternionEventChannel.receiveBroadcastStream().map((dynamic event) {
       final List<num> list = event.cast<num>();
       Accuracy accuracy = Accuracy.unknown;
       switch (list[4].toInt()) {
@@ -458,7 +458,7 @@ class MethodChannelSensors extends SensorsPlatform {
           accuracy = Accuracy.high;
           break;
       }
-      return RotationQuaternionEvent(
+      return OrientationQuaternionEvent(
         list[0].toDouble(),
         list[1].toDouble(),
         list[2].toDouble(),
@@ -467,14 +467,14 @@ class MethodChannelSensors extends SensorsPlatform {
         accuracy,
       );
     });
-    return _rotationQuaternionEvents!;
+    return _orientationQuaternionEvents!;
   }
 
   /// Returns a boolean value indicating whether the rotation quaternion sensor
   /// is available.
   @override
-  Future<bool> get isRotationQuaternionSensorAvailable async {
-    return await _methodChannel.invokeMethod('isRotationQuaternionAvailable');
+  Future<bool> get isOrientationQuaternionSensorAvailable async {
+    return await _methodChannel.invokeMethod('isOrientationQuaternionAvailable');
   }
 
   /// Returns a broadcast stream of events from the device absolute rotation
