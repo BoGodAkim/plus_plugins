@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import Flutter
+import CoreMotion
 
 var _eventChannels: [String: FlutterEventChannel] = [:]
 var _streamHandlers: [String: MotionStreamHandler] = [:]

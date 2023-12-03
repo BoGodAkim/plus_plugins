@@ -8,62 +8,78 @@ import UIKit
 import CoreMotion
 
 let GRAVITY = 9.81
-var _motionManager: CMMotionManager!
 
 public protocol MotionStreamHandler: FlutterStreamHandler {
     var samplingPeriod: Int { get set }
     func isAvailable() -> Bool
 }
 
-func _initMotionManager() {
-    if (_motionManager == nil) {
-        _motionManager = CMMotionManager()
-        _motionManager.showsDeviceMovementDisplay = true
-        _motionManager.accelerometerUpdateInterval = 0.2
-        _motionManager.deviceMotionUpdateInterval = 0.2
-        _motionManager.gyroUpdateInterval = 0.2
-        _motionManager.magnetometerUpdateInterval = 0.2
-    }
-}
-
-func sendData(data: Array<Float64>, sink: @escaping FlutterEventSink) {
-    if _isCleanUp {
-        return
-    }
-    // Even after [detachFromEngineForRegistrar] some events may still be received
-    // and fired until fully detached.
-
-    var duplicatedData = data
-    // IOS doesn't have accuracy data, so we send -1 (unknown) instead.
-    duplicatedData += [Float64(-1)]
-    duplicatedData += [Float64((Date().timeIntervalSince1970 * 1000000).rounded())]
-
-    DispatchQueue.main.async {
-        duplicatedData.withUnsafeBufferPointer { buffer in
-            sink(FlutterStandardTypedData.init(float64: Data(buffer: buffer)))
-        }
-    }
-}
-
-class FPPAccelerometerStreamHandlerPlus: NSObject, MotionStreamHandler {
+class FPPSensorsPlusStreamHandler: NSObject, MotionStreamHandlerFactory {
+    private let motionManager = CMMotionManager()
 
     var samplingPeriod = 200000 {
         didSet {
-            _initMotionManager()
-            _motionManager.accelerometerUpdateInterval = Double(samplingPeriod) * 0.000001
+            setUpdateInterval(Double(samplingPeriod) * 0.000001)
         }
     }
 
+    init() {
+        setUpdateInterval(Double(samplingPeriod) * 0.000001)
+    }
+
+    func dealloc() {
+        FPPSensorsPlusPlugin._cleanUp()
+    }
+
+    private func setUpdateInterval(_ interval: Double) {
+        motionManager.accelerometerUpdateInterval = interval
+        motionManager.gyroUpdateInterval = interval
+        motionManager.magnetometerUpdateInterval = interval
+        motionManager.deviceMotionUpdateInterval = interval
+    }
+
+    private func sendData(data: Array<Float64>, sink: @escaping FlutterEventSink) {
+        if _isCleanUp {
+            return
+        }
+        // Even after [detachFromEngineForRegistrar] some events may still be received
+        // and fired until fully detached.
+
+        var duplicatedData = data
+        // IOS doesn't have accuracy data, so we send -1 (unknown) instead.
+        duplicatedData += [Float64(-1)]
+        duplicatedData += [Float64((Date().timeIntervalSince1970 * 1000000).rounded())]
+
+        DispatchQueue.main.async {
+            duplicatedData.withUnsafeBufferPointer { buffer in
+                sink(FlutterStandardTypedData.init(float64: Data(buffer: buffer)))
+            }
+        }
+    }
+}
+
+
+
+
+class FPPAccelerometerStreamHandlerPlus: FPPSensorsPlusStreamHandler {
+
+    override init() {
+        super.init() 
+    }
+
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.accelerometerUpdateInterval = interval
+    }
+
     func isAvailable() -> Bool {
-        return CMMotionManager().isAccelerometerAvailable
+        return motionManager.isAccelerometerAvailable
     }
 
     func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startAccelerometerUpdates(to: OperationQueue()) { data, error in
+        motionManager.startAccelerometerUpdates(to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -91,22 +107,19 @@ class FPPAccelerometerStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopAccelerometerUpdates()
+        motionManager.stopAccelerometerUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
-class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
+class FPPUserAccelStreamHandlerPlus: FPPSensorsPlusStreamHandler {
 
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
+    override init() {
+        super.init() 
+    }
+
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.deviceMotionUpdateInterval = interval
     }
 
     func isAvailable() -> Bool {
@@ -117,8 +130,8 @@ class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startDeviceMotionUpdates(to: OperationQueue()) { data, error in
+        motionManager.showsDeviceMovementDisplay = true
+        motionManager.startDeviceMotionUpdates(to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -146,22 +159,19 @@ class FPPUserAccelStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
-class FPPGravityStreamHandlerPlus: NSObject, MotionStreamHandler {
+class FPPGravityStreamHandlerPlus: FPPSensorsPlusStreamHandler {
 
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
+    override init() {
+        super.init() 
+    }
+
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.deviceMotionUpdateInterval = interval
     }
 
     func isAvailable() -> Bool {
@@ -172,8 +182,8 @@ class FPPGravityStreamHandlerPlus: NSObject, MotionStreamHandler {
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startDeviceMotionUpdates(to: OperationQueue()) { data, error in
+        motionManager.showsDeviceMovementDisplay = true
+        motionManager.startDeviceMotionUpdates(to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -201,22 +211,19 @@ class FPPGravityStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
-class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
+class FPPGyroscopeStreamHandlerPlus: FPPSensorsPlusStreamHandler {
 
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.gyroUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
+    override init() {
+        super.init() 
+    }
+
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.gyroUpdateInterval = interval
     }
 
     func isAvailable() -> Bool {
@@ -227,8 +234,7 @@ class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startGyroUpdates(to: OperationQueue()) { data, error in
+        motionManager.startGyroUpdates(to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -247,22 +253,19 @@ class FPPGyroscopeStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopGyroUpdates()
+        motionManager.stopGyroUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
-class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
+class FPPMagnetometerStreamHandlerPlus: FPPSensorsPlusStreamHandler {
 
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.magnetometerUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
+    override init() {
+        super.init() 
+    }
+
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.magnetometerUpdateInterval = interval
     }
 
     func isAvailable() -> Bool {
@@ -273,8 +276,7 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startMagnetometerUpdates(to: OperationQueue()) { data, error in
+        motionManager.startMagnetometerUpdates(to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -293,40 +295,34 @@ class FPPMagnetometerStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
-class FPPOrientationStreamHandlerPlus: NSObject, MotionStreamHandler {
+class FPPOrientationStreamHandlerPlus: FPPSensorsPlusStreamHandler {
     private var attitudeReferenceFrame: CMAttitudeReferenceFrame
 
-    init(_ referenceFrame: CMAttitudeReferenceFrame) {
+    override init(_ referenceFrame: CMAttitudeReferenceFrame) {
+        super.init()
         attitudeReferenceFrame = referenceFrame
     }
 
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.deviceMotionUpdateInterval = interval
     }
 
     func isAvailable() -> Bool {
         let motionManager = CMMotionManager()
-        return motionManager.isDeviceMotionAvailable && motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
+        return motionManager.isDeviceMotionAvailable //&& motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
     }
 
     func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
+        motionManager.showsDeviceMovementDisplay = true
+        motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -339,16 +335,17 @@ class FPPOrientationStreamHandlerPlus: NSObject, MotionStreamHandler {
                 return
             }
             let attitude = data!.attitude
+            let yaw = attitude.yaw
             if self.attitudeReferenceFrame == CMAttitudeReferenceFrame.xMagneticNorthZVertical {
                 // Remap y-axis to magnetic north instead of the x-axis,
                 // to align with Android.
-                attitude.yaw = (data!.attitude.yaw + Double.pi + Double.pi / 2).truncatingRemainder(dividingBy: Double.pi * 2) - Double.pi
+                yaw = (data!.attitude.yaw + Double.pi + Double.pi / 2).truncatingRemainder(dividingBy: Double.pi * 2) - Double.pi
             }
             sendData(
                     data:[
                         attitude.roll,
                         attitude.pitch,
-                        attitude.yaw
+                        yaw
                         ],
                     sink: sink
             )
@@ -357,40 +354,30 @@ class FPPOrientationStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
-public class FPPRotationQuaternionStreamHandlerPlus: NSObject, MotionStreamHandler {
+public class FPPRotationQuaternionStreamHandlerPlus: FPPSensorsPlusStreamHandler {
     private var attitudeReferenceFrame: CMAttitudeReferenceFrame
 
-    init(_ referenceFrame: CMAttitudeReferenceFrame) {
+    override init(_ referenceFrame: CMAttitudeReferenceFrame) {
+        super.init()
         attitudeReferenceFrame = referenceFrame
-    }
-
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
     }
 
     func isAvailable() -> Bool {
         let motionManager = CMMotionManager()
-        return motionManager.isDeviceMotionAvailable && motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
+        return motionManager.isDeviceMotionAvailable //&& motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
     }
 
     func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
+        motionManager.showsDeviceMovementDisplay = true
+        motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -417,41 +404,35 @@ public class FPPRotationQuaternionStreamHandlerPlus: NSObject, MotionStreamHandl
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
 
 
-public class FPPRotationMatrixStreamHandlerPlus: NSObject, MotionStreamHandler {
+public class FPPRotationMatrixStreamHandlerPlus: FPPSensorsPlusStreamHandler {
     private var attitudeReferenceFrame: CMAttitudeReferenceFrame
 
-    init(_ referenceFrame: CMAttitudeReferenceFrame) {
+    override init(_ referenceFrame: CMAttitudeReferenceFrame) {
+        super.init()
         attitudeReferenceFrame = referenceFrame
     }
 
-    var samplingPeriod = 200000 {
-        didSet {
-            _initMotionManager()
-            _motionManager.deviceMotionUpdateInterval = Double(samplingPeriod) * 0.000001
-        }
+    override func setUpdateInterval(_ interval: Double) {
+        motionManager.deviceMotionUpdateInterval = interval
     }
 
     func isAvailable() -> Bool {
         let motionManager = CMMotionManager()
-        return motionManager.isDeviceMotionAvailable && motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
+        return motionManager.isDeviceMotionAvailable //&& motionManager.availableAttitudeReferenceFrames() & attitudeReferenceFrame
     }
 
     func onListen(
             withArguments arguments: Any?,
             eventSink sink: @escaping FlutterEventSink
     ) -> FlutterError? {
-        _initMotionManager()
-        _motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
+        motionManager.showsDeviceMovementDisplay = true
+        motionManager.startDeviceMotionUpdates( using: attitudeReferenceFrame, to: OperationQueue()) { data, error in
             if _isCleanUp {
                 return
             }
@@ -483,11 +464,7 @@ public class FPPRotationMatrixStreamHandlerPlus: NSObject, MotionStreamHandler {
     }
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        _motionManager.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         return nil
-    }
-
-    func dealloc() {
-        FPPSensorsPlusPlugin._cleanUp()
     }
 }
